@@ -57,6 +57,15 @@ def test_create_and_list_entries(client):
     assert "Morning run" in entries[0]["preview"]
 
 
+def test_create_blank_entry_uses_default_title(client):
+    create_response = client.post("/api/entries", json={"title": "", "content": ""})
+    assert create_response.status_code == 201
+
+    created_entry = create_response.get_json()["entry"]
+    assert created_entry["title"] == "Untitled Entry"
+    assert created_entry["content"] == ""
+
+
 def test_get_and_update_entry(client):
     create_response = client.post(
         "/api/entries",
@@ -76,6 +85,14 @@ def test_get_and_update_entry(client):
     get_response = client.get(f"/api/entries/{entry_id}")
     assert get_response.status_code == 200
     assert get_response.get_json()["entry"]["content"].endswith("today.")
+
+    clear_response = client.patch(
+        f"/api/entries/{entry_id}",
+        json={"content": "", "title": ""},
+    )
+    assert clear_response.status_code == 200
+    assert clear_response.get_json()["entry"]["title"] == "Untitled Entry"
+    assert clear_response.get_json()["entry"]["content"] == ""
 
 
 def test_insights_endpoint_reports_missing_configuration(client):

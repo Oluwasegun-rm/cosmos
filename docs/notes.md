@@ -23,6 +23,13 @@ This project starts as a lightweight AI journaling scaffold.
 
 - scaffold the React notes-style dashboard against the current API contract
 
+## Frontend direction
+
+- React dashboard scaffolded with Vite
+- three-panel layout: note list, editor, insights
+- entry editing uses autosave against the Flask API
+- focus mode collapses the left note list
+
 ## Agent workflow reminder
 
 When extending the project, prefer small steps and keep documentation current.

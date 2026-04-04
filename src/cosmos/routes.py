@@ -42,11 +42,8 @@ def register_routes(app: Flask) -> None:
     def api_create_entry():
         """Create a journal entry."""
         payload = _get_json_payload()
-        content = str(payload.get("content", "")).strip()
+        content = str(payload.get("content", ""))
         title = str(payload.get("title", ""))
-
-        if not content:
-            return jsonify({"error": "content is required"}), 400
 
         entry = create_entry(title=title, content=content)
         return jsonify({"entry": entry}), 201
@@ -73,9 +70,7 @@ def register_routes(app: Flask) -> None:
 
         content = None
         if "content" in payload:
-            content = str(payload.get("content", "")).strip()
-            if not content:
-                return jsonify({"error": "content cannot be empty"}), 400
+            content = str(payload.get("content", ""))
 
         entry = update_entry(entry_id, title=title, content=content)
         if entry is None:

@@ -14,6 +14,15 @@ run:
 test:
 	$(PYTHON) -m pytest -q
 
+frontend-install:
+	cd frontend && npm install
+
+frontend-dev:
+	cd frontend && npm run dev
+
+frontend-build:
+	cd frontend && npm run build
+
 lint:
 	@echo "Add a linter such as ruff or flake8 when ready."
 

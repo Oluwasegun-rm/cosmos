@@ -22,6 +22,14 @@ The project provides a clean starting point for building a journaling applicatio
 - generate entry insights through the OpenAI Responses API once `OPENAI_API_KEY` is configured
 - keep AI integration behind a small service boundary in `src/cosmos/analysis.py`
 
+## Current frontend features
+
+- React dashboard with a three-panel notes-style layout
+- left sidebar for entry navigation and creation
+- center editor with autosave and focus mode
+- right insights panel for AI analysis status and results
+- white-and-blue interface with responsive layout behavior
+
 ## Structure
 
 ```text
@@ -43,6 +51,15 @@ cosmos/
 │       ├── db.py
 │       ├── journal.py
 │       └── routes.py
+├── frontend/
+│   ├── package.json
+│   ├── vite.config.js
+│   └── src/
+│       ├── App.jsx
+│       ├── App.css
+│       ├── api.js
+│       ├── index.css
+│       └── main.jsx
 └── tests/
     └── test_app.py
 ```
@@ -53,6 +70,7 @@ cosmos/
 2. Install dependencies.
 3. Copy `.env.example` to `.env` and update values.
 4. Run the development server.
+5. Run the React frontend.
 
 ### Quick start
 
@@ -62,6 +80,14 @@ source .venv/bin/activate
 make install
 cp .env.example .env
 make dev
+```
+
+In a second terminal:
+
+```bash
+cd frontend
+npm install
+npm run dev
 ```
 
 ### Environment values
@@ -81,6 +107,9 @@ make install   # install dependencies
 make dev       # run local dev server
 make run       # same as dev for now
 make test      # run tests
+make frontend-install  # install frontend dependencies
+make frontend-dev      # run the React dev server
+make frontend-build    # build the React app
 make lint      # placeholder lint command
 make format    # placeholder format command
 make clean     # remove cache files
@@ -100,9 +129,10 @@ POST   /api/entries/<id>/insights
 
 `POST /api/entries/<id>/insights` will return `503 not_configured` until `OPENAI_API_KEY` is set.
 
+The frontend development server proxies `/api` and `/health` to the Flask app at `http://127.0.0.1:5000`.
+
 ## Notes for future customization
 
-- Add the React dashboard that consumes the journal API.
 - Expand the analysis prompts and insight rendering once the frontend is in place.
 - Expand tests as features are added.
 - Keep the repo structure predictable so agents can work safely in parallel.
