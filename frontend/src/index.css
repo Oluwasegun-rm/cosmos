@@ -1,21 +1,24 @@
 :root {
-  --page-top: #eff6ff;
-  --page-bottom: #e8f0f9;
-  --panel-bg: rgba(255, 255, 255, 0.82);
-  --panel-border: rgba(191, 213, 236, 0.72);
-  --panel-shadow: 0 24px 70px rgba(15, 23, 42, 0.12);
-  --ink: #10223a;
-  --ink-soft: #5b7088;
-  --accent: #1d6fe9;
-  --accent-deep: #1451a8;
-  --accent-soft: #e8f1ff;
-  --font-sans: "Avenir Next", "Segoe UI", "Helvetica Neue", sans-serif;
-  --font-display: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
+  --page-top: #f6f9ff;
+  --page-bottom: #dce9fb;
+  --panel-bg: rgba(255, 255, 255, 0.9);
+  --panel-border: rgba(169, 193, 224, 0.72);
+  --panel-shadow: 0 22px 52px rgba(37, 99, 235, 0.08);
+  --ink: #10233d;
+  --ink-soft: #5a708e;
+  --accent: #1f68d6;
+  --accent-deep: #164f9f;
+  --accent-soft: #e5efff;
+  /* Keep the typography calm and editorial without introducing remote font dependencies. */
+  --font-ui: "Avenir Next", "Helvetica Neue", "Segoe UI", sans-serif;
+  --font-text: "Charter", "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  --font-display: Baskerville, "Baskerville Old Face", "Hoefler Text", Garamond, serif;
   color: var(--ink);
-  font-family: var(--font-sans);
+  font-family: var(--font-ui);
   font-size: 17px;
   font-synthesis: none;
   line-height: 1.5;
+  letter-spacing: 0.01em;
   text-rendering: optimizeLegibility;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
@@ -34,7 +37,8 @@ body,
 body {
   margin: 0;
   background:
-    radial-gradient(circle at top left, rgba(187, 222, 251, 0.8), transparent 38%),
+    radial-gradient(circle at top left, rgba(151, 196, 255, 0.65), transparent 34%),
+    radial-gradient(circle at top right, rgba(191, 219, 254, 0.72), transparent 28%),
     linear-gradient(180deg, var(--page-top) 0%, var(--page-bottom) 100%);
 }
 
@@ -42,13 +46,10 @@ body::before {
   content: '';
   position: fixed;
   inset: 0;
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.58) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.52) 1px, transparent 1px);
-  background-position: center;
-  background-size: 32px 32px;
-  mask-image: radial-gradient(circle at center, rgba(0, 0, 0, 0.7), transparent 78%);
-  opacity: 0.35;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.52), transparent 36%),
+    radial-gradient(circle at bottom left, rgba(29, 111, 233, 0.1), transparent 42%);
+  opacity: 0.85;
   pointer-events: none;
 }
 
@@ -66,6 +67,11 @@ textarea {
 input::placeholder,
 textarea::placeholder {
   color: rgba(91, 112, 136, 0.74);
+}
+
+input,
+textarea {
+  font-family: var(--font-text);
 }
 
 @media (max-width: 860px) {
