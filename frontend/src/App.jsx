@@ -303,7 +303,6 @@ function App() {
                 <strong>{entry.title}</strong>
                 <span>{formatDay(entry.updated_at)}</span>
               </div>
-              <p>{entry.preview || 'Empty note'}</p>
             </button>
           ))}
         </div>
