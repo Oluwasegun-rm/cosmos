@@ -10,7 +10,8 @@
   --accent-deep: #164f9f;
   --accent-soft: #e5efff;
   /* Keep the typography calm and editorial without introducing remote font dependencies. */
-  --font-ui: "Avenir Next", "Helvetica Neue", "Segoe UI", sans-serif;
+  --font-ui: "SF Pro Display", "Avenir Next", "Helvetica Neue", "Segoe UI", sans-serif;
+  --font-clean: "SF Pro Text", "Avenir Next", "Helvetica Neue", "Segoe UI", sans-serif;
   --font-text: "Charter", "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
   --font-display: Baskerville, "Baskerville Old Face", "Hoefler Text", Garamond, serif;
   color: var(--ink);

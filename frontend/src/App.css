@@ -17,10 +17,11 @@
   flex-wrap: wrap;
   gap: 8px;
   color: var(--ink);
-  font-family: var(--font-display);
-  font-size: clamp(1.7rem, 3vw, 2.45rem);
-  letter-spacing: -0.035em;
-  line-height: 1.05;
+  font-family: var(--font-clean);
+  font-size: clamp(1.45rem, 2.5vw, 2rem);
+  font-weight: 650;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
 }
 
 .profile-name input {
@@ -31,6 +32,7 @@
   color: var(--accent-deep);
   font-family: inherit;
   font-size: inherit;
+  font-weight: inherit;
   letter-spacing: inherit;
   line-height: inherit;
   padding: 0 0 3px;
@@ -176,9 +178,10 @@
 
 .entry-card__row strong {
   color: var(--ink);
-  font-size: 0.98rem;
-  font-family: var(--font-text);
-  font-weight: 600;
+  font-size: 0.95rem;
+  font-family: var(--font-clean);
+  font-weight: 650;
+  letter-spacing: -0.01em;
   line-height: 1.35;
 }
 
