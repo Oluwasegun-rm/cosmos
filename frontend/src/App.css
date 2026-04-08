@@ -104,8 +104,8 @@
 .empty-state h2,
 .empty-state h3 {
   margin: 0;
-  font-family: var(--font-display);
-  font-weight: 500;
+  font-family: var(--font-clean);
+  font-weight: 650;
   letter-spacing: -0.03em;
 }
 
@@ -258,7 +258,8 @@
 }
 
 .editor__title {
-  font-family: var(--font-display);
+  font-family: var(--font-clean);
+  font-weight: 700;
   font-size: clamp(2.1rem, 3.8vw, 3.35rem);
   letter-spacing: -0.04em;
   line-height: 1.05;
@@ -268,7 +269,7 @@
 .editor__content {
   flex: 1;
   font-size: 1.04rem;
-  font-family: var(--font-text);
+  font-family: var(--font-clean);
   line-height: 1.9;
   min-height: 340px;
   padding-bottom: 16px;
@@ -300,7 +301,7 @@
 .insight-card--summary p {
   color: var(--ink);
   font-size: 1rem;
-  font-family: var(--font-text);
+  font-family: var(--font-clean);
   line-height: 1.7;
 }
 
@@ -313,7 +314,7 @@
   display: block;
   color: var(--ink);
   font-size: 1.05rem;
-  font-family: var(--font-text);
+  font-family: var(--font-clean);
   margin-top: 6px;
 }
 
