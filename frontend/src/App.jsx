@@ -20,11 +20,16 @@ const EMPTY_INSIGHTS_STATE = {
   message: '',
 }
 
+const DISPLAY_NAME_KEY = 'cosmos.displayName'
+
 function App() {
   const [entries, setEntries] = useState([])
   const [selectedEntryId, setSelectedEntryId] = useState(null)
   const [currentEntry, setCurrentEntry] = useState(null)
   const [editor, setEditor] = useState(EMPTY_EDITOR)
+  const [displayName, setDisplayName] = useState(
+    () => window.localStorage.getItem(DISPLAY_NAME_KEY) || ''
+  )
   const [isLoadingEntries, setIsLoadingEntries] = useState(true)
   const [isLoadingEntry, setIsLoadingEntry] = useState(false)
   const [isCreatingEntry, setIsCreatingEntry] = useState(false)
@@ -39,6 +44,17 @@ function App() {
   useEffect(() => {
     selectedEntryIdRef.current = selectedEntryId
   }, [selectedEntryId])
+
+  useEffect(() => {
+    const nextName = displayName.trim()
+
+    if (nextName) {
+      window.localStorage.setItem(DISPLAY_NAME_KEY, nextName)
+      return
+    }
+
+    window.localStorage.removeItem(DISPLAY_NAME_KEY)
+  }, [displayName])
 
   useEffect(() => {
     let isActive = true
@@ -252,8 +268,26 @@ function App() {
     !currentEntry || !editor.content.trim() || insightsState.status === 'loading'
 
   return (
-    <div className={`app-shell ${focusMode ? 'app-shell--focus' : ''}`}>
-      <aside className="panel sidebar" aria-label="Journal entries">
+    <div className="cosmos-page">
+      <header className="personal-header">
+        <div>
+          <p className="eyebrow">Private journal</p>
+          <label className="profile-name">
+            <span>Welcome back,</span>
+            <input
+              aria-label="Your display name"
+              onChange={(event) => setDisplayName(event.target.value)}
+              placeholder="your name"
+              type="text"
+              value={displayName}
+            />
+          </label>
+        </div>
+        <span className="local-badge">Local profile</span>
+      </header>
+
+      <div className={`app-shell ${focusMode ? 'app-shell--focus' : ''}`}>
+        <aside className="panel sidebar" aria-label="Journal entries">
         <div className="sidebar__header">
           <div>
             <p className="eyebrow">Journal Dashboard</p>
@@ -389,7 +423,8 @@ function App() {
         </div>
 
         {renderInsights(insightsState)}
-      </aside>
+        </aside>
+      </div>
     </div>
   )
 }
