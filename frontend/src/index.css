@@ -1,15 +1,16 @@
 :root {
-  --page-top: #f6f9ff;
-  --page-bottom: #dce9fb;
-  --panel-bg: rgba(255, 255, 255, 0.9);
-  --panel-border: rgba(169, 193, 224, 0.72);
-  --panel-shadow: 0 22px 52px rgba(37, 99, 235, 0.08);
-  --ink: #10233d;
-  --ink-soft: #5a708e;
-  --accent: #1f68d6;
-  --accent-deep: #164f9f;
-  --accent-soft: #e5efff;
-  /* Keep the typography calm and editorial without introducing remote font dependencies. */
+  --page-top: #f7faff;
+  --page-bottom: #d8e7ff;
+  --panel-bg: rgba(255, 255, 255, 0.78);
+  --panel-border: rgba(160, 187, 223, 0.28);
+  --panel-shadow:
+    0 36px 80px rgba(23, 37, 84, 0.12),
+    0 10px 28px rgba(37, 99, 235, 0.08);
+  --ink: #0f213f;
+  --ink-soft: #5a7294;
+  --accent: #1d67db;
+  --accent-deep: #154d9d;
+  --accent-soft: #e6f0ff;
   --font-ui: "SF Pro Display", "Avenir Next", "Helvetica Neue", "Segoe UI", sans-serif;
   --font-clean: "SF Pro Text", "Avenir Next", "Helvetica Neue", "Segoe UI", sans-serif;
   color: var(--ink);
@@ -36,20 +37,34 @@ body,
 body {
   margin: 0;
   background:
-    radial-gradient(circle at top left, rgba(151, 196, 255, 0.65), transparent 34%),
-    radial-gradient(circle at top right, rgba(191, 219, 254, 0.72), transparent 28%),
-    linear-gradient(180deg, var(--page-top) 0%, var(--page-bottom) 100%);
+    radial-gradient(circle at 12% 18%, rgba(125, 211, 252, 0.54), transparent 24%),
+    radial-gradient(circle at 86% 14%, rgba(147, 197, 253, 0.68), transparent 22%),
+    radial-gradient(circle at 50% 110%, rgba(59, 130, 246, 0.18), transparent 34%),
+    linear-gradient(180deg, var(--page-top) 0%, #eef5ff 35%, var(--page-bottom) 100%);
 }
 
-body::before {
+body::before,
+body::after {
   content: '';
   position: fixed;
   inset: 0;
-  background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.52), transparent 36%),
-    radial-gradient(circle at bottom left, rgba(29, 111, 233, 0.1), transparent 42%);
-  opacity: 0.85;
   pointer-events: none;
+}
+
+body::before {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.6), transparent 38%),
+    radial-gradient(circle at bottom left, rgba(29, 103, 219, 0.12), transparent 34%);
+  opacity: 0.92;
+}
+
+body::after {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.26) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.22) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: radial-gradient(circle at center, rgba(0, 0, 0, 0.72), transparent 82%);
+  opacity: 0.42;
 }
 
 #root {
@@ -65,7 +80,7 @@ textarea {
 
 input::placeholder,
 textarea::placeholder {
-  color: rgba(91, 112, 136, 0.74);
+  color: rgba(90, 114, 148, 0.72);
 }
 
 input,
