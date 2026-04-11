@@ -23,12 +23,10 @@ def client(app):
     return app.test_client()
 
 
-
 def test_home_route(client):
     response = client.get("/")
     assert response.status_code == 200
     assert response.get_json()["project"] == "Cosmos"
-
 
 
 def test_health_route(client):
@@ -45,7 +43,10 @@ def test_create_and_list_entries(client):
     assert create_response.status_code == 201
 
     created_entry = create_response.get_json()["entry"]
-    assert created_entry["title"] == "Morning run, coffee, then focused work for most of the day."
+    assert (
+        created_entry["title"]
+        == "Morning run, coffee, then focused work for most of the day."
+    )
     assert created_entry["content"].startswith("Morning run")
 
     list_response = client.get("/api/entries")
@@ -69,7 +70,10 @@ def test_create_blank_entry_uses_default_title(client):
 def test_get_and_update_entry(client):
     create_response = client.post(
         "/api/entries",
-        json={"title": "Daily Check-In", "content": "I felt calm and productive today."},
+        json={
+            "title": "Daily Check-In",
+            "content": "I felt calm and productive today.",
+        },
     )
     entry_id = create_response.get_json()["entry"]["id"]
 
@@ -93,6 +97,24 @@ def test_get_and_update_entry(client):
     assert clear_response.status_code == 200
     assert clear_response.get_json()["entry"]["title"] == "Untitled Entry"
     assert clear_response.get_json()["entry"]["content"] == ""
+
+
+def test_delete_entry(client):
+    create_response = client.post(
+        "/api/entries",
+        json={"title": "To Delete", "content": "This will be removed."},
+    )
+    entry_id = create_response.get_json()["entry"]["id"]
+
+    delete_response = client.delete(f"/api/entries/{entry_id}")
+    assert delete_response.status_code == 200
+    assert delete_response.get_json()["deleted"] is True
+
+    get_response = client.get(f"/api/entries/{entry_id}")
+    assert get_response.status_code == 404
+
+    not_found_response = client.delete(f"/api/entries/{entry_id}")
+    assert not_found_response.status_code == 404
 
 
 def test_insights_endpoint_reports_missing_configuration(client):
