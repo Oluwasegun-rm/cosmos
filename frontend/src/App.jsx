@@ -36,8 +36,16 @@ function useTypingAnimation(text, speed = 80, startDelay = 500) {
   return { displayedText, isTyping }
 }
 
+const NAV_ITEMS = [
+  { id: 'journal', label: 'Journal', icon: 'auto_stories' },
+  { id: 'reflections', label: 'Reflections', icon: 'self_improvement' },
+  { id: 'universe', label: 'Universe', icon: 'public' },
+  { id: 'archive', label: 'Archive', icon: 'inventory_2' },
+]
+
 function App() {
   const [view, setView] = useState('landing')
+  const [currentSection, setCurrentSection] = useState('journal')
   const [entries, setEntries] = useState([])
   const [selectedId, setSelectedId] = useState(null)
   const [current, setCurrent] = useState(null)
@@ -160,22 +168,16 @@ function App() {
         </div>
         
         <nav className="sidebar-nav">
-          <a href="#" className="nav-item active">
-            <span className="material-symbols-outlined">auto_stories</span>
-            <span>Journal</span>
-          </a>
-          <a href="#" className="nav-item">
-            <span className="material-symbols-outlined">self_improvement</span>
-            <span>Reflections</span>
-          </a>
-          <a href="#" className="nav-item">
-            <span className="material-symbols-outlined">public</span>
-            <span>Universe</span>
-          </a>
-          <a href="#" className="nav-item">
-            <span className="material-symbols-outlined">inventory_2</span>
-            <span>Archive</span>
-          </a>
+          {NAV_ITEMS.map(item => (
+            <button
+              key={item.id}
+              className={`nav-item ${currentSection === item.id ? 'active' : ''}`}
+              onClick={() => setCurrentSection(item.id)}
+            >
+              <span className="material-symbols-outlined">{item.icon}</span>
+              <span>{item.label}</span>
+            </button>
+          ))}
         </nav>
 
         <button className="sidebar-new-btn" onClick={handleCreate}>
@@ -184,14 +186,14 @@ function App() {
         </button>
 
         <div className="sidebar-footer">
-          <a href="#" className="footer-link">
+          <button className="footer-link">
             <span className="material-symbols-outlined">settings</span>
             <span>Settings</span>
-          </a>
-          <a href="#" className="footer-link">
+          </button>
+          <button className="footer-link">
             <span className="material-symbols-outlined">help_outline</span>
             <span>Support</span>
-          </a>
+          </button>
         </div>
       </aside>
 
