@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Cosmos | The Digital Sanctuary</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary-fixed-variant": "#004493",
+                    "on-surface-variant": "#414755",
+                    "background": "#f9f9fb",
+                    "on-background": "#1a1c1d",
+                    "on-secondary-fixed": "#1b1b1b",
+                    "surface-container-high": "#e8e8ea",
+                    "surface-container-highest": "#e2e2e4",
+                    "primary-fixed": "#d8e2ff",
+                    "error-container": "#ffdad6",
+                    "surface-variant": "#e2e2e4",
+                    "on-tertiary-container": "#fffbff",
+                    "surface-tint": "#005bc1",
+                    "primary-fixed-dim": "#adc6ff",
+                    "primary-container": "#0070eb",
+                    "inverse-on-surface": "#f0f0f2",
+                    "secondary-fixed": "#e2e2e2",
+                    "on-surface": "#1a1c1d",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-dim": "#d9dadc",
+                    "secondary": "#5e5e5e",
+                    "on-tertiary-fixed-variant": "#7c2e00",
+                    "outline": "#717786",
+                    "secondary-container": "#e2e2e2",
+                    "surface-container-low": "#f3f3f5",
+                    "outline-variant": "#c1c6d7",
+                    "surface-container": "#eeeef0",
+                    "on-secondary": "#ffffff",
+                    "on-secondary-fixed-variant": "#474747",
+                    "on-tertiary-fixed": "#351000",
+                    "inverse-primary": "#adc6ff",
+                    "tertiary": "#9e3d00",
+                    "error": "#ba1a1a",
+                    "surface-bright": "#f9f9fb",
+                    "inverse-surface": "#2f3132",
+                    "on-error": "#ffffff",
+                    "on-primary-container": "#fefcff",
+                    "on-primary-fixed": "#001a41",
+                    "surface": "#f9f9fb",
+                    "on-secondary-container": "#646464",
+                    "tertiary-fixed": "#ffdbcc",
+                    "secondary-fixed-dim": "#c6c6c6",
+                    "on-tertiary": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "tertiary-container": "#c64f00",
+                    "on-error-container": "#93000a",
+                    "primary": "#0058bc",
+                    "tertiary-fixed-dim": "#ffb595"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Inter"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(20px); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="bg-background text-on-surface selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-transparent backdrop-blur-xl shadow-[0_10px_40px_rgba(0,26,65,0.06)]">
+<nav class="max-w-7xl mx-auto flex justify-between items-center px-12 py-8">
+<div class="text-2xl font-light tracking-widest text-slate-900 dark:text-slate-50">Cosmos</div>
+<div class="hidden md:flex items-center gap-12 font-inter leading-relaxed">
+<a class="text-[#0058bc] dark:text-blue-400 border-b border-[#0058bc] pb-1 hover:text-[#0058bc] dark:hover:text-blue-300 transition-all opacity-80 hover:opacity-100" href="#">Essence</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-[#0058bc] dark:hover:text-blue-300 transition-all opacity-80 hover:opacity-100" href="#">Flow</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-[#0058bc] dark:hover:text-blue-300 transition-all opacity-80 hover:opacity-100" href="#">Presence</a>
+</div>
+<div class="flex items-center gap-6">
+<button class="material-symbols-outlined text-slate-600 hover:text-primary transition-colors" data-icon="dark_mode">dark_mode</button>
+<button class="bg-primary-container text-on-primary-container px-6 py-2.5 rounded-xl font-medium hover:scale-95 transition-transform duration-200">Begin Journey</button>
+</div>
+</nav>
+</header>
+<main class="pt-40">
+<!-- Hero Section -->
+<section class="max-w-7xl mx-auto px-12 pb-32">
+<div class="flex flex-col items-start max-w-4xl">
+<span class="text-[0.75rem] uppercase tracking-[0.2em] font-medium text-primary mb-8">A SPACE FOR REFLECTION</span>
+<h1 class="text-[4rem] md:text-[5.5rem] font-light leading-[1.1] tracking-tight text-on-surface mb-12">
+                    Journal your thoughts with intent
+                </h1>
+<div class="flex items-center gap-8">
+<button class="bg-primary-container text-on-primary-container px-10 py-5 rounded-xl text-lg font-medium hover:scale-95 transition-transform duration-200 shadow-xl shadow-primary/20">
+                        Start Writing
+                    </button>
+<div class="flex flex-col">
+<span class="text-[0.75rem] uppercase tracking-[0.1em] text-secondary font-semibold">ESTABLISHED 2024</span>
+<span class="text-on-surface-variant font-light">Join the sanctuary.</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Asymmetric Bento Experience -->
+<section class="bg-surface-container-low py-32 overflow-hidden">
+<div class="max-w-7xl mx-auto px-12">
+<div class="grid grid-cols-12 gap-6">
+<!-- Writing Canvas Card -->
+<div class="col-span-12 md:col-span-8 bg-surface-container-lowest p-16 rounded-[2rem] shadow-[0_10px_40px_rgba(0,26,65,0.04)] flex flex-col gap-12 relative overflow-hidden">
+<div class="flex justify-between items-start">
+<div>
+<span class="text-[0.75rem] uppercase tracking-[0.1em] text-secondary">THE EDITOR</span>
+<h3 class="text-2xl mt-2 font-medium">Clutter-free creation.</h3>
+</div>
+<span class="material-symbols-outlined text-primary text-4xl" data-icon="edit_note">edit_note</span>
+</div>
+<div class="space-y-6">
+<div class="h-1 bg-surface-container-low w-3/4 rounded-full"></div>
+<div class="h-1 bg-surface-container-low w-full rounded-full"></div>
+<div class="h-1 bg-surface-container-low w-2/3 rounded-full"></div>
+</div>
+<img class="w-full h-80 object-cover rounded-xl mt-4 grayscale opacity-40" data-alt="Minimalist writing interface with crisp typography and vast white space for deep mental focus" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAEd25ukthxLpFwZ_Jh9nNKIZniX6q-HHWMd_jG6thyH_Rl-OetC0lnZZKvcVqrFQZtunrggFuF0HJeIWoGmdnegeOCDOQtxUqdEY9XesG0gvkfm63NzKrA5zli-3Rgpi5iMINIOmcgPllv2cK3p4lDz51-KlKa4xpaFZYYj0leK-VPoHerSJ3blQWbpmPkuiGwi5Y8leUBb-bb29UXQFtPBX74xFaMZgwUrcprQ68-EgmQOOwl0nteQrWKYS3CgkkSL2a0IUPp0XKu"/>
+</div>
+<!-- Side Stats -->
+<div class="col-span-12 md:col-span-4 flex flex-col gap-6">
+<div class="flex-1 bg-primary text-on-primary p-12 rounded-[2rem] flex flex-col justify-between">
+<span class="material-symbols-outlined text-5xl" data-icon="auto_stories">auto_stories</span>
+<div>
+<h4 class="text-4xl font-light mb-2">Universe</h4>
+<p class="text-on-primary-container/80 uppercase tracking-widest text-xs">Visualized Memory</p>
+</div>
+</div>
+<div class="flex-1 bg-surface-container-highest p-12 rounded-[2rem] border border-outline-variant/15">
+<h4 class="text-5xl font-light text-primary mb-4">∞</h4>
+<p class="text-on-surface-variant text-sm font-medium uppercase tracking-tighter">UNLIMITED ENTRIES</p>
+</div>
+</div>
+<!-- Mood Tracking -->
+<div class="col-span-12 md:col-span-4 bg-[#e8e8ea] p-12 rounded-[2rem] flex flex-col gap-8">
+<span class="material-symbols-outlined text-3xl text-primary" data-icon="self_improvement">self_improvement</span>
+<h4 class="text-2xl font-light tracking-tight">Emotional Resonance</h4>
+<div class="flex flex-wrap gap-2">
+<span class="bg-surface-container-lowest px-4 py-2 rounded-full text-[0.7rem] uppercase tracking-widest">Peace</span>
+<span class="bg-surface-container-lowest px-4 py-2 rounded-full text-[0.7rem] uppercase tracking-widest">Insight</span>
+<span class="bg-surface-container-lowest px-4 py-2 rounded-full text-[0.7rem] uppercase tracking-widest">Growth</span>
+</div>
+</div>
+<!-- Aesthetic Image -->
+<div class="col-span-12 md:col-span-8 rounded-[2rem] overflow-hidden relative group">
+<img class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" data-alt="A clean modern workspace with a single journal and a cup of coffee sitting in soft afternoon sunlight filtering through curtains" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCh-jvp5C66kvxdTykVX1atMjJonNUjPNV0WxGVJACByNvLyhfJlCyvVHRbVrmHlkrTRwLI9w3RVjryiaZLusWhaEa43JnhjXkZLYeOW2Zz7r9TDy2TyH5JzqvCt6jkmc57ro-JPfCuJ6f97POU1DJZiv3VacS4I-HrzRwxXGpox7BrGaALmSi_BAk3e_v9aeRxaydh1OFKaHOqPRKZWTEfC92nbZwZ27WcyfBIl9rEhsOfcIq0FNmjd18vxc8PHJfUdebIKNZWG2sc"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent flex items-end p-12">
+<p class="text-xl font-light italic">"The digital extension of your inner world."</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Final Call -->
+<section class="py-40 text-center max-w-4xl mx-auto px-12">
+<h2 class="text-5xl font-light tracking-tighter mb-12">Your sanctuary is waiting.</h2>
+<div class="flex justify-center gap-12 items-center">
+<button class="bg-primary text-white px-12 py-6 rounded-xl font-medium tracking-wide hover:scale-95 transition-transform">Get Started Free</button>
+<a class="text-primary uppercase tracking-[0.2em] text-xs font-bold border-b-2 border-primary/20 pb-1" href="#">View Philosophy</a>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-12 bg-[#f9f9fb] dark:bg-slate-950 border-t border-slate-200/15 dark:border-slate-800/15">
+<div class="flex flex-col items-center gap-6 max-w-7xl mx-auto px-12">
+<div class="flex gap-12 text-[0.75rem] uppercase tracking-[0.1em] font-inter">
+<a class="text-slate-400 hover:text-[#0058bc] transition-colors" href="#">Philosophy</a>
+<a class="text-slate-400 hover:text-[#0058bc] transition-colors" href="#">Privacy</a>
+<a class="text-slate-400 hover:text-[#0058bc] transition-colors" href="#">Rituals</a>
+</div>
+<p class="text-[0.75rem] uppercase tracking-[0.1em] font-inter text-slate-400">© 2024 Cosmos. A space for your thoughts.</p>
+</div>
+</footer>
+</body></html>

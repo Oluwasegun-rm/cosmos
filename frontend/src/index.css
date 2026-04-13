@@ -1,16 +1,29 @@
 :root {
-  --bg: #ffffff;
-  --surface: #f8f9fa;
-  --border: #e5e7eb;
-  --ink: #111827;
-  --ink-soft: #6b7280;
-  --accent: #2563eb;
-  --accent-hover: #1d4ed8;
-  --accent-soft: #eff6ff;
+  --background: #f9f9fb;
+  --surface-container-lowest: #ffffff;
+  --surface-container: #eeeef0;
+  --surface-container-high: #e8e8ea;
+  --surface-dim: #d9dadc;
+  --surface: #f9f9fb;
+  --on-background: #1a1c1d;
+  --on-surface: #1a1c1d;
+  --on-surface-variant: #414755;
+  --primary: #0058bc;
+  --primary-fixed: #d8e2ff;
+  --primary-container: #0070eb;
+  --on-primary: #ffffff;
+  --on-primary-container: #fefcff;
+  --secondary: #5e5e5e;
+  --on-secondary: #ffffff;
+  --tertiary: #9e3d00;
+  --outline: #717786;
+  --outline-variant: #c1c6d7;
+  --error: #ba1a1a;
+  
   --font: "Inter", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
   font-family: var(--font);
   font-size: 16px;
-  color: var(--ink);
+  color: var(--on-surface);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

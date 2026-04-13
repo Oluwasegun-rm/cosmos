@@ -1,8 +1,40 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { createEntry, deleteEntry, fetchEntries, fetchEntry, updateEntry } from './api'
 import './App.css'
 
 const EMPTY = { title: '', content: '' }
+
+function useTypingAnimation(text, speed = 80, startDelay = 500) {
+  const [displayedText, setDisplayedText] = useState('')
+  const [isTyping, setIsTyping] = useState(false)
+  const hasStarted = useRef(false)
+
+  useEffect(() => {
+    if (hasStarted.current) return
+    hasStarted.current = true
+
+    const timeout = setTimeout(() => {
+      setIsTyping(true)
+      let index = 0
+      
+      const interval = setInterval(() => {
+        if (index <= text.length) {
+          setDisplayedText(text.slice(0, index))
+          index++
+        } else {
+          setIsTyping(false)
+          clearInterval(interval)
+        }
+      }, speed)
+
+      return () => clearInterval(interval)
+    }, startDelay)
+
+    return () => clearTimeout(timeout)
+  }, [text, speed, startDelay])
+
+  return { displayedText, isTyping }
+}
 
 function App() {
   const [view, setView] = useState('landing')
@@ -93,14 +125,26 @@ function App() {
   }
 
   if (view === 'landing') {
+    const titleLine1 = useTypingAnimation('Journal your thoughts', 85, 800)
+    const titleLine2 = useTypingAnimation('with intent', 85, titleLine1.isTyping ? 0 : 200)
+
     return (
       <div className="landing">
         <p className="landing-brand">Cosmos</p>
-        <h1 className="landing-title">Journal your thoughts<br />with intent</h1>
-        <p className="landing-subtitle">
+        <h1 className="landing-title">
+          {titleLine1.displayedText}
+          <br />
+          {titleLine2.displayedText}
+          <span className={`typing-cursor ${titleLine2.isTyping || (!titleLine1.isTyping && !titleLine2.isTyping) ? 'visible' : ''}`}>|</span>
+        </h1>
+        <p className="landing-subtitle" style={{ opacity: titleLine2.isTyping ? 1 : 0, transition: 'opacity 0.8s ease-in-out' }}>
           A calm, distraction-free space to write, reflect, and revisit your thoughts.
         </p>
-        <button className="btn btn-primary" onClick={() => setView('app')}>
+        <button 
+          className="btn btn-primary" 
+          onClick={() => setView('app')}
+          style={{ opacity: titleLine2.isTyping ? 1 : 0, transform: titleLine2.isTyping ? 'translateY(0)' : 'translateY(10px)', transition: 'opacity 0.6s ease-in-out, transform 0.6s ease-in-out' }}
+        >
           Start Writing
         </button>
       </div>
@@ -110,19 +154,58 @@ function App() {
   return (
     <div className="app-shell">
       <aside className="sidebar">
-        <div className="sidebar-header">
-          <span className="sidebar-brand">Cosmos</span>
-          <button className="btn btn-primary" onClick={handleCreate}>
-            New Note
-          </button>
+        <div>
+          <h1 className="sidebar-brand">Cosmos</h1>
+          <p className="sidebar-tagline">The Digital Sanctuary</p>
         </div>
-        <div className="sidebar-list">
+        
+        <nav className="sidebar-nav">
+          <a href="#" className="nav-item active">
+            <span className="material-symbols-outlined">auto_stories</span>
+            <span>Journal</span>
+          </a>
+          <a href="#" className="nav-item">
+            <span className="material-symbols-outlined">self_improvement</span>
+            <span>Reflections</span>
+          </a>
+          <a href="#" className="nav-item">
+            <span className="material-symbols-outlined">public</span>
+            <span>Universe</span>
+          </a>
+          <a href="#" className="nav-item">
+            <span className="material-symbols-outlined">inventory_2</span>
+            <span>Archive</span>
+          </a>
+        </nav>
+
+        <button className="sidebar-new-btn" onClick={handleCreate}>
+          <span className="material-symbols-outlined">add</span>
+          New Entry
+        </button>
+
+        <div className="sidebar-footer">
+          <a href="#" className="footer-link">
+            <span className="material-symbols-outlined">settings</span>
+            <span>Settings</span>
+          </a>
+          <a href="#" className="footer-link">
+            <span className="material-symbols-outlined">help_outline</span>
+            <span>Support</span>
+          </a>
+        </div>
+      </aside>
+
+      <section className="entry-list-panel">
+        <div className="entry-list-header">
+          <span className="entry-list-label">All Entries</span>
+        </div>
+        <div className="entry-list">
           {loading && entries.length === 0 ? (
-            <p style={{ color: 'var(--ink-soft)', fontSize: '0.9rem', padding: '12px 14px' }}>
+            <p style={{ color: 'var(--on-surface-variant)', fontSize: '0.9rem', padding: '12px 14px' }}>
               Loading...
             </p>
           ) : entries.length === 0 ? (
-            <p style={{ color: 'var(--ink-soft)', fontSize: '0.9rem', padding: '12px 14px' }}>
+            <p style={{ color: 'var(--on-surface-variant)', fontSize: '0.9rem', padding: '12px 14px' }}>
               No notes yet. Create one to get started.
             </p>
           ) : (
@@ -141,27 +224,34 @@ function App() {
             ))
           )}
         </div>
-      </aside>
+      </section>
 
       <main className="editor-area">
-        <div className="editor-header">
-          <span className="editor-meta">
-            {current ? formatLongDate(current.updated_at) : ''}
-          </span>
-          <div style={{ display: 'flex', gap: '8px' }}>
+        <header className="editor-header">
+          <div className="editor-meta">
+            <span className="editor-meta-status">Sanctuary Mode</span>
+            <span className="editor-meta-dot"></span>
+            <span className="editor-meta-saving">
+              {saving ? 'Saving...' : lastSaved ? `Saved ${formatTime(lastSaved)}` : ''}
+            </span>
+          </div>
+          <div className="editor-actions">
+            <button title="Share">
+              <span className="material-symbols-outlined">share</span>
+            </button>
+            <button title="More">
+              <span className="material-symbols-outlined">more_vert</span>
+            </button>
             {current && (
-              <button
-                className="btn btn-danger"
-                onClick={() => handleDelete(current.id)}
-              >
-                Delete
+              <button title="Delete" onClick={() => handleDelete(current.id)}>
+                <span className="material-symbols-outlined">delete</span>
               </button>
             )}
-            <button className="btn btn-ghost" onClick={() => setView('landing')}>
-              Back
-            </button>
+            <div className="editor-user-avatar">
+              <img alt="User profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJpMrasblxLNYbPGm1HN4Z717CM9LYavdVURDhQMnVqEbptyqQZPBFmg0H55qfDHS4Q5zYbHbvOtQq39ZxESO_pqECimcV-WLqZTYRcYk0IDULKnffnT8m3K9jf9NBu2OYusCCpqKkOONw_2A63ZizZYT1d-8_O5bgxDoH0gbdDDGAO2sfc7udLIBmi1nnCrbB7TivqsWSOROlSZgkEoET5StWSPhDupTdul5h3L7iyoBlGtIldFy3q_x_nMJabHANii3FTiIF24Ek" />
+            </div>
           </div>
-        </div>
+        </header>
 
         <div className="editor-body">
           {!current && !loading ? (
@@ -173,7 +263,8 @@ function App() {
               </button>
             </div>
           ) : current ? (
-            <div>
+            <div className="editor-canvas">
+              <p className="editor-date">{formatLongDate(current.updated_at)}</p>
               <input
                 className="editor-title"
                 placeholder="Untitled Entry"
@@ -192,51 +283,27 @@ function App() {
             </div>
           ) : null}
         </div>
-
-        {saving && (
-          <div style={{
-            position: 'fixed',
-            bottom: 20,
-            right: 20,
-            fontSize: '0.8rem',
-            color: 'var(--ink-soft)',
-            background: 'var(--surface)',
-            padding: '6px 12px',
-            borderRadius: '6px',
-            border: '1px solid var(--border)',
-          }}>
-            Saving...
-          </div>
-        )}
-        {!saving && lastSaved && (
-          <div style={{
-            position: 'fixed',
-            bottom: 20,
-            right: 20,
-            fontSize: '0.8rem',
-            color: 'var(--ink-soft)',
-            background: 'var(--surface)',
-            padding: '6px 12px',
-            borderRadius: '6px',
-            border: '1px solid var(--border)',
-          }}>
-            Saved {formatTime(lastSaved)}
-          </div>
-        )}
       </main>
     </div>
   )
 }
 
 function formatDate(ts) {
-  return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-    .format(new Date(ts))
+  const now = new Date()
+  const then = new Date(ts)
+  const diffDays = Math.floor((now - then) / (1000 * 60 * 60 * 24))
+  
+  if (diffDays === 0) return 'Just Now'
+  if (diffDays === 1) return 'Yesterday'
+  if (diffDays < 7) return `${diffDays} Days Ago`
+  
+  return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' })
+    .format(then)
 }
 
 function formatLongDate(ts) {
   return new Intl.DateTimeFormat('en-US', {
     weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
-    hour: 'numeric', minute: '2-digit'
   }).format(new Date(ts))
 }
 
