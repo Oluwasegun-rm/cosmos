@@ -54,6 +54,9 @@ function App() {
   const [saving, setSaving] = useState(false)
   const [lastSaved, setLastSaved] = useState(null)
 
+  const titleLine1 = useTypingAnimation('Journal your thoughts', 85, 800)
+  const titleLine2 = useTypingAnimation('with intent', 85, titleLine1.isTyping ? 0 : 200)
+
   useEffect(() => {
     loadEntries()
   }, [])
@@ -133,9 +136,6 @@ function App() {
   }
 
   if (view === 'landing') {
-    const titleLine1 = useTypingAnimation('Journal your thoughts', 85, 800)
-    const titleLine2 = useTypingAnimation('with intent', 85, titleLine1.isTyping ? 0 : 200)
-
     return (
       <div className="landing">
         <p className="landing-brand">Cosmos</p>
