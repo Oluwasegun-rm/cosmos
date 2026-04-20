@@ -62,6 +62,7 @@ function App() {
   const [lastSaved, setLastSaved] = useState(null)
   const [showSettings, setShowSettings] = useState(false)
   const [showSupport, setShowSupport] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
   const titleLine1 = useTypingAnimation('Journal your thoughts', 85, 800)
   const titleLine2 = useTypingAnimation('with intent', 85, titleLine1.isTyping ? 0 : 200)
@@ -151,6 +152,22 @@ function App() {
     const next = { ...editor, content: e.target.value }
     setEditor(next)
     syncPreview(selectedId, next, setEntries)
+  }
+
+  async function handleCategoryChange(category) {
+    if (!current) return
+    try {
+      setSaving(true)
+      const { entry } = await updateEntry(current.id, { title: editor.title, content: editor.content, category })
+      setCurrent(entry)
+      setEditor(prev => ({ ...prev, category }))
+      setEntries(prev => prev.map(e => e.id === entry.id ? entry : e))
+      setLastSaved(new Date())
+    } catch (err) {
+      console.error('Failed to update category:', err)
+    } finally {
+      setSaving(false)
+    }
   }
 
   if (view === 'landing') {
@@ -263,7 +280,7 @@ function App() {
               <span className="material-symbols-outlined">more_vert</span>
             </button>
             {current && (
-              <button title="Delete" onClick={() => handleDelete(current.id)}>
+              <button title="Delete" onClick={() => setShowDeleteConfirm(true)}>
                 <span className="material-symbols-outlined">delete</span>
               </button>
             )}
@@ -284,6 +301,17 @@ function App() {
             </div>
           ) : current ? (
             <div className="editor-canvas">
+              <div className="editor-section-selector">
+                {Object.entries(SECTIONS).map(([id, label]) => (
+                  <button
+                    key={id}
+                    className={`section-chip ${current.category === id ? 'active' : ''}`}
+                    onClick={() => handleCategoryChange(id)}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
               <p className="editor-date">{formatLongDate(current.updated_at)}</p>
               <input
                 className="editor-title"
@@ -358,6 +386,26 @@ function App() {
               <div className="support-section">
                 <h3>Contact</h3>
                 <p>For feedback or issues, reach out to the development team.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showDeleteConfirm && (
+        <div className="modal-overlay" onClick={() => setShowDeleteConfirm(false)}>
+          <div className="modal-content small" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Delete Entry</h2>
+              <button className="modal-close" onClick={() => setShowDeleteConfirm(false)}>
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+            <div className="modal-body">
+              <p>Are you sure you want to delete this entry? This action cannot be undone.</p>
+              <div className="modal-actions">
+                <button className="btn" onClick={() => setShowDeleteConfirm(false)}>Cancel</button>
+                <button className="delete-confirm-btn" onClick={() => { handleDelete(current.id); setShowDeleteConfirm(false) }}>Delete</button>
               </div>
             </div>
           </div>
