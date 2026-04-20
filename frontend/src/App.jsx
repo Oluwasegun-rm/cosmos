@@ -69,6 +69,7 @@ function App() {
 
   useEffect(() => {
     loadEntries()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
@@ -76,6 +77,7 @@ function App() {
     setCurrent(null)
     setEditor(EMPTY)
     loadEntries()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentSection])
 
   useEffect(() => {
@@ -104,7 +106,8 @@ function App() {
     }, 500)
 
     return () => clearTimeout(id)
-  }, [editor])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editor, current])
 
   async function loadEntries() {
     setLoading(true)
