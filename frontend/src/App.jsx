@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import { createEntry, deleteEntry, fetchEntries, fetchEntry, updateEntry } from './api'
 import './App.css'
 
@@ -69,6 +69,7 @@ function App() {
 
   const titleLine1 = useTypingAnimation('Journal your thoughts', 85, 800)
   const titleLine2 = useTypingAnimation('with intent', 85, titleLine1.isTyping ? 0 : 200)
+  const isAnimationComplete = titleLine1.displayedText && titleLine2.displayedText
 
   useEffect(() => {
     loadEntries()
@@ -110,7 +111,7 @@ function App() {
 
     return () => clearTimeout(id)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [editor, current])
+  }, [editor])
 
   async function loadEntries() {
     setLoading(true)
@@ -122,15 +123,22 @@ function App() {
       } else if (list.length === 0) {
         setSelectedId(null)
       }
+    } catch (err) {
+      console.error('Failed to load entries:', err)
     } finally {
       setLoading(false)
     }
   }
 
   async function loadEntry(id) {
-    const { entry } = await fetchEntry(id)
-    setCurrent(entry)
-    setEditor({ title: entry.title, content: entry.content })
+    try {
+      const { entry } = await fetchEntry(id)
+      setCurrent(entry)
+      setEditor({ title: entry.title, content: entry.content, category: entry.category })
+    } catch (err) {
+      console.error('Failed to load entry:', err)
+      setSelectedId(null)
+    }
   }
 
   async function handleCreate() {
@@ -184,15 +192,15 @@ function App() {
           {titleLine1.displayedText}
           <br />
           {titleLine2.displayedText}
-          <span className={`typing-cursor ${titleLine1.isTyping || titleLine2.isTyping || (!titleLine1.displayedText && !titleLine2.displayedText) ? 'visible' : 'visible'}`}>|</span>
+          <span className={`typing-cursor ${titleLine1.isTyping || titleLine2.isTyping || isAnimationComplete ? 'visible' : ''}`}>|</span>
         </h1>
-        <p className="landing-subtitle" style={{ opacity: titleLine1.displayedText && titleLine2.displayedText ? 1 : 0, transition: 'opacity 0.8s ease-in-out' }}>
+        <p className="landing-subtitle" style={{ opacity: isAnimationComplete ? 1 : 0, transition: 'opacity 0.8s ease-in-out' }}>
           A calm, distraction-free space to write, reflect, and revisit your thoughts.
         </p>
         <button 
           className="btn btn-primary" 
           onClick={() => setView('app')}
-          style={{ opacity: titleLine1.displayedText && titleLine2.displayedText ? 1 : 0, transform: titleLine1.displayedText && titleLine2.displayedText ? 'translateY(0)' : 'translateY(10px)', transition: 'opacity 0.6s ease-in-out, transform 0.6s ease-in-out' }}
+          style={{ opacity: isAnimationComplete ? 1 : 0, transform: isAnimationComplete ? 'translateY(0)' : 'translateY(10px)', transition: 'opacity 0.6s ease-in-out, transform 0.6s ease-in-out', pointerEvents: isAnimationComplete ? 'auto' : 'none' }}
         >
           Start Writing
         </button>
@@ -243,7 +251,7 @@ function App() {
           <span className="entry-list-label">{SECTIONS[currentSection] || 'All Entries'}</span>
         </div>
         <div className="entry-list">
-          {loading && entries.length === 0 ? (
+          {loading ? (
             <p style={{ color: 'var(--on-surface-variant)', fontSize: '0.9rem', padding: '12px 14px' }}>
               Loading...
             </p>
