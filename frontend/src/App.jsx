@@ -56,6 +56,8 @@ const SECTIONS = {
 function App() {
   const [view, setView] = useState('landing')
   const [currentSection, setCurrentSection] = useState('journal')
+  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [entryListOpen, setEntryListOpen] = useState(true)
   const [entries, setEntries] = useState([])
   const [selectedId, setSelectedId] = useState(null)
   const [current, setCurrent] = useState(null)
@@ -210,44 +212,74 @@ function App() {
 
   return (
     <div className="app-shell">
-      <aside className="sidebar">
-        <div>
-          <h1 className="sidebar-brand">Cosmos</h1>
-          <p className="sidebar-tagline">The Digital Sanctuary</p>
+      <aside className={`sidebar ${sidebarOpen ? '' : 'collapsed'}`}>
+        <div className="sidebar-header">
+          {!sidebarOpen && (
+            <button className="sidebar-toggle" onClick={() => setSidebarOpen(!sidebarOpen)} title="Open sidebar">
+              <span className="material-symbols-outlined">menu</span>
+            </button>
+          )}
+          {sidebarOpen && (
+            <>
+              <h1 className="sidebar-brand">Cosmos</h1>
+              <p className="sidebar-tagline">The Digital Sanctuary</p>
+              <button className="sidebar-toggle" onClick={() => setSidebarOpen(!sidebarOpen)} title="Close sidebar">
+                <span className="material-symbols-outlined">chevron_left</span>
+              </button>
+            </>
+          )}
         </div>
         
-        <nav className="sidebar-nav">
-          {NAV_ITEMS.map(item => (
-            <button
-              key={item.id}
-              className={`nav-item ${currentSection === item.id ? 'active' : ''}`}
-              onClick={() => setCurrentSection(item.id)}
-            >
-              <span className="material-symbols-outlined">{item.icon}</span>
-              <span>{item.label}</span>
-            </button>
-          ))}
-        </nav>
+        {sidebarOpen ? (
+          <nav className="sidebar-nav">
+            {NAV_ITEMS.map(item => (
+              <button
+                key={item.id}
+                className={`nav-item ${currentSection === item.id ? 'active' : ''}`}
+                onClick={() => setCurrentSection(item.id)}
+              >
+                <span className="material-symbols-outlined">{item.icon}</span>
+                <span>{item.label}</span>
+              </button>
+            ))}
+          </nav>
+        ) : (
+          <nav className="sidebar-nav collapsed">
+            {NAV_ITEMS.map(item => (
+              <button
+                key={item.id}
+                className={`nav-item-icon ${currentSection === item.id ? 'active' : ''}`}
+                onClick={() => setCurrentSection(item.id)}
+                title={item.label}
+              >
+                <span className="material-symbols-outlined">{item.icon}</span>
+              </button>
+            ))}
+          </nav>
+        )}
 
         <button className="sidebar-new-btn" onClick={handleCreate}>
           <span className="material-symbols-outlined">add</span>
-          New Entry
+          {sidebarOpen && <span>New Entry</span>}
         </button>
 
         <div className="sidebar-footer">
-          <button className="footer-link" onClick={() => setShowSettings(true)}>
+          <button className="footer-link" onClick={() => setShowSettings(true)} title="Settings">
             <span className="material-symbols-outlined">settings</span>
-            <span>Settings</span>
+            {sidebarOpen && <span>Settings</span>}
           </button>
-          <button className="footer-link" onClick={() => setShowSupport(true)}>
+          <button className="footer-link" onClick={() => setShowSupport(true)} title="Support">
             <span className="material-symbols-outlined">help_outline</span>
-            <span>Support</span>
+            {sidebarOpen && <span>Support</span>}
           </button>
         </div>
       </aside>
 
       <section className="entry-list-panel">
         <div className="entry-list-header">
+          <button className="list-toggle" onClick={() => setEntryListOpen(!entryListOpen)} title={entryListOpen ? 'Collapse list' : 'Expand list'}>
+            <span className="material-symbols-outlined">{entryListOpen ? 'chevron_left' : 'list'}</span>
+          </button>
           <span className="entry-list-label">{SECTIONS[currentSection] || 'All Entries'}</span>
         </div>
         <div className="entry-list">
