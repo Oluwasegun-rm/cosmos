@@ -7,30 +7,33 @@ const EMPTY = { title: '', content: '' }
 function useTypingAnimation(text, speed = 80, startDelay = 500) {
   const [displayedText, setDisplayedText] = useState('')
   const [isTyping, setIsTyping] = useState(false)
-  const hasStarted = useRef(false)
 
   useEffect(() => {
-    if (hasStarted.current) return
-    hasStarted.current = true
-
-    const timeout = setTimeout(() => {
+    let timeout
+    let interval
+    
+    const startTyping = () => {
+      setDisplayedText('')
       setIsTyping(true)
       let index = 0
       
-      const interval = setInterval(() => {
-        if (index <= text.length) {
-          setDisplayedText(text.slice(0, index))
+      interval = setInterval(() => {
+        if (index < text.length) {
+          setDisplayedText(text.slice(0, index + 1))
           index++
         } else {
           setIsTyping(false)
           clearInterval(interval)
         }
       }, speed)
-
-      return () => clearInterval(interval)
-    }, startDelay)
-
-    return () => clearTimeout(timeout)
+    }
+    
+    timeout = setTimeout(startTyping, startDelay)
+    
+    return () => {
+      clearTimeout(timeout)
+      if (interval) clearInterval(interval)
+    }
   }, [text, speed, startDelay])
 
   return { displayedText, isTyping }
@@ -181,7 +184,7 @@ function App() {
           {titleLine1.displayedText}
           <br />
           {titleLine2.displayedText}
-          <span className={`typing-cursor ${titleLine2.isTyping || (!titleLine1.isTyping && !titleLine2.isTyping) ? 'visible' : ''}`}>|</span>
+          <span className={`typing-cursor ${titleLine1.isTyping || titleLine2.isTyping || (!titleLine1.displayedText && !titleLine2.displayedText) ? 'visible' : ''}`}>|</span>
         </h1>
         <p className="landing-subtitle" style={{ opacity: titleLine2.isTyping ? 1 : 0, transition: 'opacity 0.8s ease-in-out' }}>
           A calm, distraction-free space to write, reflect, and revisit your thoughts.
