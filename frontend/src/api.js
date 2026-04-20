@@ -2,8 +2,9 @@ const JSON_HEADERS = {
   'Content-Type': 'application/json',
 }
 
-export async function fetchEntries() {
-  return request('/api/entries')
+export async function fetchEntries(category = null) {
+  const url = category ? `/api/entries?category=${category}` : '/api/entries'
+  return request(url)
 }
 
 export async function fetchEntry(entryId) {

@@ -10,35 +10,51 @@ from .db import get_db
 PREVIEW_LENGTH = 140
 
 
-def list_entries() -> list[dict]:
-    """Return journal entries ordered by recent activity."""
-    rows = (
-        get_db()
-        .execute(
-            """
-        SELECT id, title, content, created_at, updated_at
-        FROM entries
-        ORDER BY updated_at DESC, id DESC
-        """
+def list_entries(category: str | None = None) -> list[dict]:
+    """Return journal entries ordered by recent activity, optionally filtered by category."""
+    if category:
+        rows = (
+            get_db()
+            .execute(
+                """
+            SELECT id, title, content, category, created_at, updated_at
+            FROM entries
+            WHERE category = ?
+            ORDER BY updated_at DESC, id DESC
+            """,
+                (category,),
+            )
+            .fetchall()
         )
-        .fetchall()
-    )
+    else:
+        rows = (
+            get_db()
+            .execute(
+                """
+            SELECT id, title, content, category, created_at, updated_at
+            FROM entries
+            ORDER BY updated_at DESC, id DESC
+            """
+            )
+            .fetchall()
+        )
     return [_serialize_entry(row, include_content=False) for row in rows]
 
 
-def create_entry(title: str, content: str) -> dict:
+def create_entry(title: str, content: str, category: str = "journal") -> dict:
     """Create a journal entry and return it."""
     cleaned_content = content.strip()
     cleaned_title = _normalize_title(title, cleaned_content)
     timestamp = _utc_now()
+    valid_category = category if category in {"journal", "reflections", "universe", "archive"} else "journal"
 
     connection = get_db()
     cursor = connection.execute(
         """
-        INSERT INTO entries (title, content, created_at, updated_at)
-        VALUES (?, ?, ?, ?)
+        INSERT INTO entries (title, content, category, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?)
         """,
-        (cleaned_title, cleaned_content, timestamp, timestamp),
+        (cleaned_title, cleaned_content, valid_category, timestamp, timestamp),
     )
     connection.commit()
 
@@ -51,7 +67,7 @@ def get_entry(entry_id: int) -> dict | None:
         get_db()
         .execute(
             """
-        SELECT id, title, content, created_at, updated_at
+        SELECT id, title, content, category, created_at, updated_at
         FROM entries
         WHERE id = ?
         """,
@@ -70,6 +86,7 @@ def update_entry(
     *,
     title: str | None = None,
     content: str | None = None,
+    category: str | None = None,
 ) -> dict | None:
     """Update a journal entry and return the latest version."""
     existing = get_entry(entry_id)
@@ -84,14 +101,18 @@ def update_entry(
     if title is None and content is not None and not existing["title"].strip():
         next_title = _normalize_title("", next_content)
 
+    next_category = existing["category"]
+    if category is not None:
+        next_category = category if category in {"journal", "reflections", "universe", "archive"} else existing["category"]
+
     connection = get_db()
     connection.execute(
         """
         UPDATE entries
-        SET title = ?, content = ?, updated_at = ?
+        SET title = ?, content = ?, category = ?, updated_at = ?
         WHERE id = ?
         """,
-        (next_title, next_content, _utc_now(), entry_id),
+        (next_title, next_content, next_category, _utc_now(), entry_id),
     )
     connection.commit()
 
@@ -234,10 +255,16 @@ def _serialize_entry(row, *, include_content: bool) -> dict:
     entry = {
         "id": row["id"],
         "title": row["title"],
+        "category": "journal",
         "preview": _build_preview(row["content"]),
         "created_at": row["created_at"],
         "updated_at": row["updated_at"],
     }
+    if len(row) > 3:
+        try:
+            entry["category"] = row["category"]
+        except Exception:
+            entry["category"] = "journal"
     if include_content:
         entry["content"] = row["content"]
     return entry

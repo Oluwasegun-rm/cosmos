@@ -35,8 +35,9 @@ def register_routes(app: Flask) -> None:
 
     @app.get("/api/entries")
     def api_list_entries():
-        """List saved journal entries."""
-        return jsonify({"entries": list_entries()})
+        """List saved journal entries, optionally filtered by category."""
+        category = request.args.get("category")
+        return jsonify({"entries": list_entries(category)})
 
     @app.post("/api/entries")
     def api_create_entry():
@@ -44,8 +45,9 @@ def register_routes(app: Flask) -> None:
         payload = _get_json_payload()
         content = str(payload.get("content", ""))
         title = str(payload.get("title", ""))
+        category = str(payload.get("category", "journal"))
 
-        entry = create_entry(title=title, content=content)
+        entry = create_entry(title=title, content=content, category=category)
         return jsonify({"entry": entry}), 201
 
     @app.get("/api/entries/<int:entry_id>")
@@ -61,8 +63,8 @@ def register_routes(app: Flask) -> None:
     def api_update_entry(entry_id: int):
         """Update a journal entry."""
         payload = _get_json_payload()
-        if "title" not in payload and "content" not in payload:
-            return jsonify({"error": "title or content is required"}), 400
+        if "title" not in payload and "content" not in payload and "category" not in payload:
+            return jsonify({"error": "title, content, or category is required"}), 400
 
         title = None
         if "title" in payload:
@@ -72,7 +74,11 @@ def register_routes(app: Flask) -> None:
         if "content" in payload:
             content = str(payload.get("content", ""))
 
-        entry = update_entry(entry_id, title=title, content=content)
+        category = None
+        if "category" in payload:
+            category = str(payload.get("category", ""))
+
+        entry = update_entry(entry_id, title=title, content=content, category=category)
         if entry is None:
             return jsonify({"error": "entry not found"}), 404
 

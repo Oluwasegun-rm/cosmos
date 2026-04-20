@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS entries (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL,
     content TEXT NOT NULL,
+    category TEXT NOT NULL DEFAULT 'journal',
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL
 );

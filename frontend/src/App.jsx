@@ -43,6 +43,13 @@ const NAV_ITEMS = [
   { id: 'archive', label: 'Archive', icon: 'inventory_2' },
 ]
 
+const SECTIONS = {
+  journal: 'Journal',
+  reflections: 'Reflections',
+  universe: 'Universe',
+  archive: 'Archive',
+}
+
 function App() {
   const [view, setView] = useState('landing')
   const [currentSection, setCurrentSection] = useState('journal')
@@ -53,6 +60,8 @@ function App() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [lastSaved, setLastSaved] = useState(null)
+  const [showSettings, setShowSettings] = useState(false)
+  const [showSupport, setShowSupport] = useState(false)
 
   const titleLine1 = useTypingAnimation('Journal your thoughts', 85, 800)
   const titleLine2 = useTypingAnimation('with intent', 85, titleLine1.isTyping ? 0 : 200)
@@ -60,6 +69,13 @@ function App() {
   useEffect(() => {
     loadEntries()
   }, [])
+
+  useEffect(() => {
+    setSelectedId(null)
+    setCurrent(null)
+    setEditor(EMPTY)
+    loadEntries()
+  }, [currentSection])
 
   useEffect(() => {
     if (selectedId == null) {
@@ -92,10 +108,12 @@ function App() {
   async function loadEntries() {
     setLoading(true)
     try {
-      const { entries: list } = await fetchEntries()
+      const { entries: list } = await fetchEntries(currentSection)
       setEntries(list)
       if (list.length > 0 && selectedId == null) {
         setSelectedId(list[0].id)
+      } else if (list.length === 0) {
+        setSelectedId(null)
       }
     } finally {
       setLoading(false)
@@ -109,7 +127,7 @@ function App() {
   }
 
   async function handleCreate() {
-    const { entry } = await createEntry({ title: '', content: '' })
+    const { entry } = await createEntry({ title: '', content: '', category: currentSection })
     setEntries(prev => [entry, ...prev])
     setSelectedId(entry.id)
   }
@@ -186,11 +204,11 @@ function App() {
         </button>
 
         <div className="sidebar-footer">
-          <button className="footer-link">
+          <button className="footer-link" onClick={() => setShowSettings(true)}>
             <span className="material-symbols-outlined">settings</span>
             <span>Settings</span>
           </button>
-          <button className="footer-link">
+          <button className="footer-link" onClick={() => setShowSupport(true)}>
             <span className="material-symbols-outlined">help_outline</span>
             <span>Support</span>
           </button>
@@ -199,7 +217,7 @@ function App() {
 
       <section className="entry-list-panel">
         <div className="entry-list-header">
-          <span className="entry-list-label">All Entries</span>
+          <span className="entry-list-label">{SECTIONS[currentSection] || 'All Entries'}</span>
         </div>
         <div className="entry-list">
           {loading && entries.length === 0 ? (
@@ -286,6 +304,65 @@ function App() {
           ) : null}
         </div>
       </main>
+
+      {showSettings && (
+        <div className="modal-overlay" onClick={() => setShowSettings(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Settings</h2>
+              <button className="modal-close" onClick={() => setShowSettings(false)}>
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="settings-section">
+                <h3>Appearance</h3>
+                <p>Theme customization coming soon.</p>
+              </div>
+              <div className="settings-section">
+                <h3>Data</h3>
+                <p>Your journal entries are stored locally.</p>
+              </div>
+              <div className="settings-section">
+                <h3>About</h3>
+                <p>Cosmos v1.0.0</p>
+                <p className="text-muted">A calm space for your thoughts.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showSupport && (
+        <div className="modal-overlay" onClick={() => setShowSupport(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Support</h2>
+              <button className="modal-close" onClick={() => setShowSupport(false)}>
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="support-section">
+                <h3>Getting Started</h3>
+                <p>Use the sidebar to navigate between sections. Click "New Entry" to start writing.</p>
+              </div>
+              <div className="support-section">
+                <h3>Tips</h3>
+                <ul>
+                  <li>Your entries auto-save as you type</li>
+                  <li>Use the category buttons to organize entries</li>
+                  <li>Delete entries using the trash icon in the editor</li>
+                </ul>
+              </div>
+              <div className="support-section">
+                <h3>Contact</h3>
+                <p>For feedback or issues, reach out to the development team.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
