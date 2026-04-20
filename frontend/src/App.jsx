@@ -184,15 +184,15 @@ function App() {
           {titleLine1.displayedText}
           <br />
           {titleLine2.displayedText}
-          <span className={`typing-cursor ${titleLine1.isTyping || titleLine2.isTyping || (!titleLine1.displayedText && !titleLine2.displayedText) ? 'visible' : ''}`}>|</span>
+          <span className={`typing-cursor ${titleLine1.isTyping || titleLine2.isTyping || (!titleLine1.displayedText && !titleLine2.displayedText) ? 'visible' : 'visible'}`}>|</span>
         </h1>
-        <p className="landing-subtitle" style={{ opacity: titleLine2.isTyping ? 1 : 0, transition: 'opacity 0.8s ease-in-out' }}>
+        <p className="landing-subtitle" style={{ opacity: titleLine1.displayedText && titleLine2.displayedText ? 1 : 0, transition: 'opacity 0.8s ease-in-out' }}>
           A calm, distraction-free space to write, reflect, and revisit your thoughts.
         </p>
         <button 
           className="btn btn-primary" 
           onClick={() => setView('app')}
-          style={{ opacity: titleLine2.isTyping ? 1 : 0, transform: titleLine2.isTyping ? 'translateY(0)' : 'translateY(10px)', transition: 'opacity 0.6s ease-in-out, transform 0.6s ease-in-out' }}
+          style={{ opacity: titleLine1.displayedText && titleLine2.displayedText ? 1 : 0, transform: titleLine1.displayedText && titleLine2.displayedText ? 'translateY(0)' : 'translateY(10px)', transition: 'opacity 0.6s ease-in-out, transform 0.6s ease-in-out' }}
         >
           Start Writing
         </button>
