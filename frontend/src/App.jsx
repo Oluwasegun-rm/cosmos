@@ -4,6 +4,14 @@ import './App.css'
 
 const EMPTY = { title: '', content: '' }
 
+function getStoredTheme() {
+  return localStorage.getItem('cosmos-theme') || 'light'
+}
+
+function setStoredTheme(theme) {
+  localStorage.setItem('cosmos-theme', theme)
+}
+
 function useTypingAnimation(text, speed = 80, startDelay = 500) {
   const [displayedText, setDisplayedText] = useState('')
   const [isTyping, setIsTyping] = useState(false)
@@ -39,6 +47,13 @@ function useTypingAnimation(text, speed = 80, startDelay = 500) {
   return { displayedText, isTyping }
 }
 
+function ThemeProvider({ children, theme }) {
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
+  }, [theme])
+  return children
+}
+
 const NAV_ITEMS = [
   { id: 'journal', label: 'Journal', icon: 'auto_stories' },
   { id: 'reflections', label: 'Reflections', icon: 'self_improvement' },
@@ -55,6 +70,7 @@ const SECTIONS = {
 
 function App() {
   const [view, setView] = useState('landing')
+  const [theme, setTheme] = useState(getStoredTheme)
   const [currentSection, setCurrentSection] = useState('journal')
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [entryListOpen, setEntryListOpen] = useState(true)
@@ -68,6 +84,8 @@ function App() {
   const [showSettings, setShowSettings] = useState(false)
   const [showSupport, setShowSupport] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [stats, setStats] = useState({ total: 0, journal: 0, reflections: 0, universe: 0, archive: 0 })
 
   const titleLine1 = useTypingAnimation('Journal your thoughts', 85, 800)
   const titleLine2 = useTypingAnimation('with intent', 85, titleLine1.isTyping ? 0 : 200)
@@ -115,11 +133,44 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editor])
 
+  useEffect(() => {
+    function handleKeyDown(e) {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'n') {
+        e.preventDefault()
+        if (view === 'app') handleCreate()
+      }
+      if ((e.metaKey || e.ctrlKey) && e.key === 'f') {
+        e.preventDefault()
+        document.querySelector('.search-input')?.focus()
+      }
+      if (e.key === 'Escape') {
+        setShowSettings(false)
+        setShowSupport(false)
+        setShowDeleteConfirm(false)
+        setSearchQuery('')
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [view])
+
   async function loadEntries() {
     setLoading(true)
     try {
       const { entries: list } = await fetchEntries(currentSection)
+      const { entries: all } = await fetchEntries()
       setEntries(list)
+      
+      const newStats = {
+        total: all.length,
+        journal: all.filter(e => e.category === 'journal').length,
+        reflections: all.filter(e => e.category === 'reflections').length,
+        universe: all.filter(e => e.category === 'universe').length,
+        archive: all.filter(e => e.category === 'archive').length,
+      }
+      setStats(newStats)
+      
       if (list.length > 0 && selectedId == null) {
         setSelectedId(list[0].id)
       } else if (list.length === 0) {
@@ -186,8 +237,36 @@ function App() {
     }
   }
 
+  function getFilteredEntries() {
+    if (!searchQuery.trim()) return entries
+    const query = searchQuery.toLowerCase()
+    return entries.filter(e => 
+      e.title.toLowerCase().includes(query) || 
+      (e.preview && e.preview.toLowerCase().includes(query))
+    )
+  }
+
+  async function handleExportEntry() {
+    if (!current) return
+    const content = `# ${current.title || 'Untitled Entry'}\n\n${editor.content}`
+    const blob = new Blob([content], { type: 'text/markdown' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${current.title || 'untitled'}.md`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  async function handleArchiveEntry() {
+    if (!current) return
+    const newCategory = current.category === 'archive' ? 'journal' : 'archive'
+    await handleCategoryChange(newCategory)
+  }
+
   if (view === 'landing') {
     return (
+      <ThemeProvider theme={theme}>
       <div className="landing">
         <p className="landing-brand">Cosmos</p>
         <h1 className="landing-title">
@@ -207,10 +286,12 @@ function App() {
           Start Writing
         </button>
       </div>
+      </ThemeProvider>
     )
   }
 
   return (
+    <ThemeProvider theme={theme}>
     <div className="app-shell">
       <aside className={`sidebar ${sidebarOpen ? '' : 'collapsed'}`}>
         <div className="sidebar-header">
@@ -282,17 +363,38 @@ function App() {
           </button>
           <span className="entry-list-label">{SECTIONS[currentSection] || 'All Entries'}</span>
         </div>
+        <div className="search-container">
+          <span className="material-symbols-outlined search-icon">search</span>
+          <input
+            type="text"
+            className="search-input"
+            placeholder="Search entries..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          {searchQuery && (
+            <button className="search-clear" onClick={() => setSearchQuery('')}>
+              <span className="material-symbols-outlined">close</span>
+            </button>
+          )}
+        </div>
         <div className="entry-list">
           {loading ? (
             <p style={{ color: 'var(--on-surface-variant)', fontSize: '0.9rem', padding: '12px 14px' }}>
               Loading...
             </p>
-          ) : entries.length === 0 ? (
-            <p style={{ color: 'var(--on-surface-variant)', fontSize: '0.9rem', padding: '12px 14px' }}>
-              No notes yet. Create one to get started.
-            </p>
+          ) : getFilteredEntries().length === 0 ? (
+            searchQuery ? (
+              <p style={{ color: 'var(--on-surface-variant)', fontSize: '0.9rem', padding: '12px 14px' }}>
+                No entries match your search.
+              </p>
+            ) : (
+              <p style={{ color: 'var(--on-surface-variant)', fontSize: '0.9rem', padding: '12px 14px' }}>
+                No notes yet. Create one to get started.
+              </p>
+            )
           ) : (
-            entries.map(entry => (
+            getFilteredEntries().map(entry => (
               <button
                 key={entry.id}
                 className={`entry-item${entry.id === selectedId ? ' active' : ''}`}
@@ -319,12 +421,19 @@ function App() {
             </span>
           </div>
           <div className="editor-actions">
-            <button title="Share">
-              <span className="material-symbols-outlined">share</span>
-            </button>
-            <button title="More">
-              <span className="material-symbols-outlined">more_vert</span>
-            </button>
+            {current && (
+              <>
+                <button title="Export as Markdown" onClick={handleExportEntry}>
+                  <span className="material-symbols-outlined">download</span>
+                </button>
+                <button 
+                  title={current.category === 'archive' ? 'Unarchive' : 'Archive'} 
+                  onClick={handleArchiveEntry}
+                >
+                  <span className="material-symbols-outlined">{current.category === 'archive' ? 'unarchive' : 'archive'}</span>
+                </button>
+              </>
+            )}
             {current && (
               <button title="Delete" onClick={() => setShowDeleteConfirm(true)}>
                 <span className="material-symbols-outlined">delete</span>
@@ -391,11 +500,69 @@ function App() {
             <div className="modal-body">
               <div className="settings-section">
                 <h3>Appearance</h3>
-                <p>Theme customization coming soon.</p>
+                <div className="theme-toggle">
+                  <button 
+                    className={`theme-btn ${theme === 'light' ? 'active' : ''}`}
+                    onClick={() => { setTheme('light'); setStoredTheme('light') }}
+                  >
+                    <span className="material-symbols-outlined">light_mode</span>
+                    Light
+                  </button>
+                  <button 
+                    className={`theme-btn ${theme === 'dark' ? 'active' : ''}`}
+                    onClick={() => { setTheme('dark'); setStoredTheme('dark') }}
+                  >
+                    <span className="material-symbols-outlined">dark_mode</span>
+                    Dark
+                  </button>
+                </div>
+              </div>
+              <div className="settings-section">
+                <h3>Statistics</h3>
+                <div className="stats-grid">
+                  <div className="stat-item">
+                    <span className="stat-value">{stats.total}</span>
+                    <span className="stat-label">Total</span>
+                  </div>
+                  <div className="stat-item">
+                    <span className="stat-value">{stats.journal}</span>
+                    <span className="stat-label">Journal</span>
+                  </div>
+                  <div className="stat-item">
+                    <span className="stat-value">{stats.reflections}</span>
+                    <span className="stat-label">Reflections</span>
+                  </div>
+                  <div className="stat-item">
+                    <span className="stat-value">{stats.universe}</span>
+                    <span className="stat-label">Universe</span>
+                  </div>
+                  <div className="stat-item">
+                    <span className="stat-value">{stats.archive}</span>
+                    <span className="stat-label">Archive</span>
+                  </div>
+                </div>
               </div>
               <div className="settings-section">
                 <h3>Data</h3>
-                <p>Your journal entries are stored locally.</p>
+                <p>Your journal entries are stored securely on your device.</p>
+                <p className="text-muted">All data is stored locally. Use the export feature to backup your entries.</p>
+              </div>
+              <div className="settings-section">
+                <h3>Keyboard Shortcuts</h3>
+                <div className="shortcuts-list">
+                  <div className="shortcut-item">
+                    <span className="shortcut-key">⌘ N</span>
+                    <span>New Entry</span>
+                  </div>
+                  <div className="shortcut-item">
+                    <span className="shortcut-key">⌘ F</span>
+                    <span>Search</span>
+                  </div>
+                  <div className="shortcut-item">
+                    <span className="shortcut-key">Esc</span>
+                    <span>Close Modal</span>
+                  </div>
+                </div>
               </div>
               <div className="settings-section">
                 <h3>About</h3>
@@ -458,6 +625,7 @@ function App() {
         </div>
       )}
     </div>
+    </ThemeProvider>
   )
 }
 
