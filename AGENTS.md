@@ -6,7 +6,13 @@ Cosmos is an AI-assisted journaling application scaffold. The long-term goal is 
 
 ## Current status
 
-This repository is an initial scaffold only. It contains a minimal Flask application, basic project structure, environment placeholders, a Makefile, and starter tests.
+This repository now includes:
+- A Flask backend with SQLite database
+- A React frontend with Material Design 3 styling
+- User authentication (signup, login, logout)
+- Journal entry CRUD with categories (Journal, Reflections, Universe, Archive)
+- Light/dark theme toggle
+- AI insights generation (requires OpenAI API key)
 
 ## Architecture overview
 
@@ -14,9 +20,38 @@ This repository is an initial scaffold only. It contains a minimal Flask applica
 - `backend/src/cosmos/__init__.py` creates the Flask app.
 - `backend/src/cosmos/routes.py` contains HTTP routes.
 - `backend/src/cosmos/config.py` centralizes environment-based config.
+- `backend/src/cosmos/db.py` handles SQLite database operations.
+- `backend/src/cosmos/auth.py` handles user authentication.
+- `backend/src/cosmos/journal.py` handles journal entry persistence.
+- `backend/src/cosmos/analysis.py` handles AI insights.
 - `frontend/` contains the React frontend.
 - `docs/` stores planning notes and design decisions.
 - `scripts/` stores helper shell scripts.
+
+## Database schema
+
+- `entries` table: id, title, content, category, created_at, updated_at
+- `users` table: id, email, password_hash, display_name, created_at, updated_at
+- `entry_insights` table: AI analysis results linked to entries
+
+## API endpoints
+
+### Auth
+- `POST /api/auth/signup` - Create new user account
+- `POST /api/auth/login` - Authenticate user
+- `POST /api/auth/logout` - Log out current user
+- `GET /api/auth/me` - Get current user
+
+### Entries
+- `GET /api/entries` - List entries (optional ?category=filter)
+- `POST /api/entries` - Create entry
+- `GET /api/entries/<id>` - Get entry
+- `PATCH /api/entries/<id>` - Update entry
+- `DELETE /api/entries/<id>` - Delete entry
+
+### Insights
+- `GET /api/entries/<id>/insights` - Get saved insights
+- `POST /api/entries/<id>/insights` - Generate new insights
 
 ## Folder responsibilities
 

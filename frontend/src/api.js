@@ -2,6 +2,28 @@ const JSON_HEADERS = {
   'Content-Type': 'application/json',
 }
 
+export async function signup(email, password, displayName) {
+  return request('/api/auth/signup', {
+    method: 'POST',
+    body: JSON.stringify({ email, password, display_name: displayName }),
+  })
+}
+
+export async function login(email, password) {
+  return request('/api/auth/login', {
+    method: 'POST',
+    body: JSON.stringify({ email, password }),
+  })
+}
+
+export async function logout() {
+  return request('/api/auth/logout', { method: 'POST' })
+}
+
+export async function getCurrentUser() {
+  return request('/api/auth/me')
+}
+
 export async function fetchEntries(category = null) {
   const url = category ? `/api/entries?category=${category}` : '/api/entries'
   return request(url)

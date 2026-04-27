@@ -15,3 +15,6 @@ class Config:
     DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///cosmos.db")
     MODEL_NAME = os.getenv("MODEL_NAME", "gpt-5.2")
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = "Lax"
+    PERMANENT_SESSION_LIFETIME = 60 * 60 * 24 * 7  # 7 days

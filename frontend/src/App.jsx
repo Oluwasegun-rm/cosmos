@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { createEntry, deleteEntry, fetchEntries, fetchEntry, updateEntry } from './api'
+import { createEntry, deleteEntry, fetchEntries, fetchEntry, login as apiLogin, logout as apiLogout, signup as apiSignup, updateEntry, getCurrentUser } from './api'
 import './App.css'
 
 const EMPTY = { title: '', content: '' }
@@ -86,15 +86,24 @@ function App() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [stats, setStats] = useState({ total: 0, journal: 0, reflections: 0, universe: 0, archive: 0 })
-
-  const titleLine1 = useTypingAnimation('Journal your thoughts', 85, 800)
-  const titleLine2 = useTypingAnimation('with intent', 85, titleLine1.isTyping ? 0 : 200)
-  const isAnimationComplete = titleLine1.displayedText && titleLine2.displayedText
+  const [user, setUser] = useState(null)
+  const [showLogin, setShowLogin] = useState(false)
+  const [showSignup, setShowSignup] = useState(false)
 
   useEffect(() => {
     loadEntries()
+    checkAuth()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  async function checkAuth() {
+    try {
+      const { user: u } = await getCurrentUser()
+      setUser(u)
+    } catch (err) {
+      setUser(null)
+    }
+  }
 
   useEffect(() => {
     setSelectedId(null)
@@ -268,23 +277,33 @@ function App() {
     return (
       <ThemeProvider theme={theme}>
       <div className="landing">
-        <p className="landing-brand">Cosmos</p>
-        <h1 className="landing-title">
-          {titleLine1.displayedText}
-          <br />
-          {titleLine2.displayedText}
-          <span className={`typing-cursor ${titleLine1.isTyping || titleLine2.isTyping || isAnimationComplete ? 'visible' : ''}`}>|</span>
-        </h1>
-        <p className="landing-subtitle" style={{ opacity: isAnimationComplete ? 1 : 0, transition: 'opacity 0.8s ease-in-out' }}>
-          A calm, distraction-free space to write, reflect, and revisit your thoughts.
-        </p>
-        <button 
-          className="btn btn-primary" 
-          onClick={() => setView('app')}
-          style={{ opacity: isAnimationComplete ? 1 : 0, transform: isAnimationComplete ? 'translateY(0)' : 'translateY(10px)', transition: 'opacity 0.6s ease-in-out, transform 0.6s ease-in-out', pointerEvents: isAnimationComplete ? 'auto' : 'none' }}
-        >
-          Start Writing
-        </button>
+        <header className="landing-header">
+          <span className="landing-logo">Cosmos</span>
+          <div className="landing-auth">
+            {user ? (
+              <>
+                <span className="user-greeting">Hi, {user.display_name}</span>
+                <button className="btn btn-link-sm" onClick={async () => { await apiLogout(); setUser(null) }}>Log out</button>
+              </>
+            ) : (
+              <>
+                <button className="btn btn-ghost-sm" onClick={() => setShowLogin(true)}>Log in</button>
+                <button className="btn btn-primary-sm" onClick={() => setShowSignup(true)}>Sign up</button>
+              </>
+            )}
+          </div>
+        </header>
+        
+        <div className="landing-content">
+          <h1 className="landing-title">Journal your thoughts<br/>with intent</h1>
+          <p className="landing-subtitle">A calm space to write, reflect, and revisit your thoughts.</p>
+          <button className="btn btn-primary-lg" onClick={() => setView('app')}>
+            Start Writing
+          </button>
+        </div>
+
+        {showLogin && <AuthModal type="login" onClose={() => setShowLogin(false)} onSwitch={() => { setShowLogin(false); setShowSignup(true) }} onAuthSuccess={checkAuth} />}
+        {showSignup && <AuthModal type="signup" onClose={() => setShowSignup(false)} onSwitch={() => { setShowSignup(false); setShowLogin(true) }} onAuthSuccess={checkAuth} />}
       </div>
       </ThemeProvider>
     )
@@ -439,9 +458,17 @@ function App() {
                 <span className="material-symbols-outlined">delete</span>
               </button>
             )}
-            <div className="editor-user-avatar">
-              <img alt="User profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJpMrasblxLNYbPGm1HN4Z717CM9LYavdVURDhQMnVqEbptyqQZPBFmg0H55qfDHS4Q5zYbHbvOtQq39ZxESO_pqECimcV-WLqZTYRcYk0IDULKnffnT8m3K9jf9NBu2OYusCCpqKkOONw_2A63ZizZYT1d-8_O5bgxDoH0gbdDDGAO2sfc7udLIBmi1nnCrbB7TivqsWSOROlSZgkEoET5StWSPhDupTdul5h3L7iyoBlGtIldFy3q_x_nMJabHANii3FTiIF24Ek" />
-            </div>
+            {user ? (
+              <div className="user-menu">
+                <span className="user-name">{user.display_name}</span>
+                <button className="btn btn-ghost btn-sm" onClick={async () => { await apiLogout(); setUser(null) }}>Log out</button>
+              </div>
+            ) : (
+              <div className="auth-buttons">
+                <button className="btn btn-ghost btn-sm" onClick={() => setShowLogin(true)}>Log in</button>
+                <button className="btn btn-primary btn-sm" onClick={() => setShowSignup(true)}>Sign up</button>
+              </div>
+            )}
           </div>
         </header>
 
@@ -624,7 +651,10 @@ function App() {
           </div>
         </div>
       )}
-    </div>
+
+      {showLogin && <AuthModal type="login" onClose={() => setShowLogin(false)} onSwitch={() => { setShowLogin(false); setShowSignup(true) }} onAuthSuccess={checkAuth} />}
+        {showSignup && <AuthModal type="signup" onClose={() => setShowSignup(false)} onSwitch={() => { setShowSignup(false); setShowLogin(true) }} onAuthSuccess={checkAuth} />}
+      </div>
     </ThemeProvider>
   )
 }
@@ -663,6 +693,88 @@ function syncPreview(id, ed, setEntries) {
 
 function buildPreview(content) {
   return content.trim().replace(/\s+/g, ' ').slice(0, 140)
+}
+
+function AuthModal({ type, onClose, onSwitch, onAuthSuccess }) {
+  const [displayName, setDisplayName] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  async function handleSubmit(e) {
+    e.preventDefault()
+    setError('')
+    setLoading(true)
+    try {
+      if (type === 'signup') {
+        await apiSignup(email, password, displayName)
+        onAuthSuccess()
+      } else {
+        await apiLogin(email, password)
+        onAuthSuccess()
+      }
+      onClose()
+    } catch (err) {
+      setError(err.message || (type === 'signup' ? 'Signup failed' : 'Login failed'))
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="auth-backdrop" onClick={onClose}>
+      <div className="auth-card" onClick={e => e.stopPropagation()}>
+        <button className="auth-close" onClick={onClose}>
+          <span className="material-symbols-outlined">close</span>
+        </button>
+        <h2 className="auth-title">{type === 'signup' ? 'Create account' : 'Welcome back'}</h2>
+        <p className="auth-subtitle">{type === 'signup' ? 'Start your journaling journey' : 'Sign in to continue'}</p>
+        
+        <form className="auth-form" onSubmit={handleSubmit}>
+          {type === 'signup' && (
+            <div className="auth-field">
+              <input
+                type="text"
+                placeholder="Your name"
+                value={displayName}
+                onChange={e => setDisplayName(e.target.value)}
+                required
+              />
+            </div>
+          )}
+          <div className="auth-field">
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              required
+            />
+          </div>
+          <div className="auth-field">
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              required
+              minLength={6}
+            />
+          </div>
+          {error && <p className="auth-error">{error}</p>}
+          <button type="submit" className="auth-btn" disabled={loading}>
+            {loading ? 'Please wait...' : type === 'signup' ? 'Create account' : 'Sign in'}
+          </button>
+        </form>
+        
+        <p className="auth-toggle">
+          {type === 'signup' ? 'Already have an account?' : "Don't have an account?"}{' '}
+          <button type="button" onClick={onSwitch}>{type === 'signup' ? 'Sign in' : 'Sign up'}</button>
+        </p>
+      </div>
+    </div>
+  )
 }
 
 export default App

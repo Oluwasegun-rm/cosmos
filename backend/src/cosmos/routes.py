@@ -1,8 +1,10 @@
 """HTTP routes for Cosmos."""
 
 from flask import Flask, jsonify, request
+from flask_login import current_user, login_user, logout_user
 
 from .analysis import AnalysisError, AnalysisNotConfiguredError, analyze_entry
+from .auth import User, authenticate_user, create_user, get_user, get_user_by_email
 from .journal import (
     create_entry,
     delete_entry,
@@ -154,6 +156,67 @@ def register_routes(app: Flask) -> None:
         return jsonify(
             {"entry_id": entry_id, "status": "available", "insights": saved}
         ), 201
+
+    @app.post("/api/auth/signup")
+    def api_signup():
+        """Create a new user account."""
+        payload = _get_json_payload()
+        email = payload.get("email", "").strip().lower()
+        password = payload.get("password", "")
+        display_name = payload.get("display_name", "").strip()
+
+        if not email or not password or not display_name:
+            return jsonify({"error": "email, password, and display_name are required"}), 400
+
+        if len(password) < 6:
+            return jsonify({"error": "password must be at least 6 characters"}), 400
+
+        if get_user_by_email(email) is not None:
+            return jsonify({"error": "email already registered"}), 409
+
+        try:
+            user = create_user(email, password, display_name)
+            del user["password_hash"]
+            return jsonify({"user": user}), 201
+        except Exception as exc:
+            return jsonify({"error": str(exc)}), 500
+
+    @app.post("/api/auth/login")
+    def api_login():
+        """Authenticate and log in a user."""
+        payload = _get_json_payload()
+        email = payload.get("email", "").strip().lower()
+        password = payload.get("password", "")
+
+        if not email or not password:
+            return jsonify({"error": "email and password are required"}), 400
+
+        user = authenticate_user(email, password)
+        if user is None:
+            return jsonify({"error": "invalid email or password"}), 401
+
+        login_user(User(user["id"]))
+        del user["password_hash"]
+        return jsonify({"user": user})
+
+    @app.post("/api/auth/logout")
+    def api_logout():
+        """Log out the current user."""
+        logout_user()
+        return jsonify({"success": True})
+
+    @app.get("/api/auth/me")
+    def api_current_user():
+        """Get the currently logged in user."""
+        if not current_user.is_authenticated:
+            return jsonify({"user": None})
+
+        user = get_user(current_user.id)
+        if user is None:
+            return jsonify({"user": None})
+
+        del user["password_hash"]
+        return jsonify({"user": user})
 
 
 def _get_json_payload() -> dict:

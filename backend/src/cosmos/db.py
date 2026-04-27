@@ -33,9 +33,19 @@ CREATE TABLE IF NOT EXISTS entry_insights (
     FOREIGN KEY (entry_id) REFERENCES entries(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    email TEXT NOT NULL UNIQUE,
+    password_hash TEXT NOT NULL,
+    display_name TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+);
+
 CREATE INDEX IF NOT EXISTS idx_entries_updated_at ON entries(updated_at DESC);
 CREATE INDEX IF NOT EXISTS idx_entry_insights_entry_id
     ON entry_insights(entry_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 """
 
 
