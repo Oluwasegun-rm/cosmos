@@ -963,10 +963,9 @@
 }
 
 .editor-canvas {
-  max-width: 720px;
+  max-width: 680px;
   width: 100%;
-  padding: 48px 32px 128px;
-  margin-left: 10%;
+  padding: 32px 24px 100px;
 }
 
 .editor-date {
@@ -983,11 +982,17 @@
   width: 100%;
   border: none;
   background: transparent;
-  font-size: 2rem;
+  font-size: 1.75rem;
   font-weight: 600;
   color: var(--on-surface);
   margin-bottom: 12px;
   padding: 0;
+  outline: none;
+}
+
+.editor-title::placeholder {
+  color: var(--on-surface-variant);
+  opacity: 0.6;
 }
   background: transparent;
   font-size: clamp(2rem, 4vw, 3.5rem);
@@ -1009,21 +1014,21 @@
   min-height: 200px;
   outline: none;
   font-weight: 400;
-  opacity: 0.85;
 }
 
 .editor-content textarea {
   width: 100%;
   border: none;
   background: transparent;
-  font-size: 1.15rem;
+  font-size: 1.1rem;
   line-height: 1.8;
-  color: rgba(26, 28, 29, 0.9);
+  color: var(--on-surface);
   min-height: 300px;
   outline: none;
   font-family: var(--font);
-  font-weight: 300;
+  font-weight: 400;
   resize: none;
+}
 }
 
 .empty-state {
