@@ -315,9 +315,12 @@ function App() {
       <aside className={`sidebar ${sidebarOpen ? '' : 'collapsed'}`}>
         <div className="sidebar-header">
           {!sidebarOpen && (
-            <button className="sidebar-toggle" onClick={() => setSidebarOpen(!sidebarOpen)} title="Open sidebar">
-              <span className="material-symbols-outlined">menu</span>
-            </button>
+            <>
+              <span className="sidebar-brand-collapsed">C</span>
+              <button className="sidebar-toggle" onClick={() => setSidebarOpen(!sidebarOpen)} title="Open sidebar">
+                <span className="material-symbols-outlined">menu</span>
+              </button>
+            </>
           )}
           {sidebarOpen && (
             <>
@@ -482,17 +485,6 @@ function App() {
             </div>
           ) : current ? (
             <div className="editor-canvas">
-              <div className="editor-section-selector">
-                {Object.entries(SECTIONS).map(([id, label]) => (
-                  <button
-                    key={id}
-                    className={`section-chip ${current.category === id ? 'active' : ''}`}
-                    onClick={() => handleCategoryChange(id)}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
               <p className="editor-date">{formatLongDate(current.updated_at)}</p>
               <input
                 className="editor-title"

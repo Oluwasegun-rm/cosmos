@@ -416,6 +416,13 @@
   flex: 1;
 }
 
+.sidebar-brand-collapsed {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--primary);
+}
+
 .sidebar-tagline {
   font-size: 0.65rem;
   letter-spacing: 0.15em;
