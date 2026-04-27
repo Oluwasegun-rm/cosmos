@@ -51,6 +51,14 @@ export async function deleteEntry(entryId) {
   return request(`/api/entries/${entryId}`, { method: 'DELETE' })
 }
 
+export async function getInsights(entryId) {
+  return request(`/api/entries/${entryId}/insights`)
+}
+
+export async function generateInsights(entryId) {
+  return request(`/api/entries/${entryId}/insights`, { method: 'POST' })
+}
+
 async function request(url, options = {}) {
   const response = await fetch(url, {
     ...options,

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { createEntry, deleteEntry, fetchEntries, fetchEntry, login as apiLogin, logout as apiLogout, signup as apiSignup, updateEntry, getCurrentUser } from './api'
+import { createEntry, deleteEntry, fetchEntries, fetchEntry, generateInsights, getInsights, login as apiLogin, logout as apiLogout, signup as apiSignup, updateEntry, getCurrentUser } from './api'
 import './App.css'
 
 const EMPTY = { title: '', content: '' }
@@ -84,6 +84,9 @@ function App() {
   const [showSettings, setShowSettings] = useState(false)
   const [showSupport, setShowSupport] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [showInsights, setShowInsights] = useState(false)
+  const [insightsData, setInsightsData] = useState(null)
+  const [insightsLoading, setInsightsLoading] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [stats, setStats] = useState({ total: 0, journal: 0, reflections: 0, universe: 0, archive: 0 })
   const [user, setUser] = useState(null)
@@ -215,6 +218,19 @@ function App() {
     setEntries(remaining)
     if (selectedId === id) {
       setSelectedId(remaining.length > 0 ? remaining[0].id : null)
+    }
+  }
+
+  async function handleGetInsights() {
+    if (!current) return
+    setInsightsLoading(true)
+    try {
+      const data = await generateInsights(current.id)
+      setInsightsData(data.insights)
+    } catch (err) {
+      console.error('Failed to get insights:', err)
+    } finally {
+      setInsightsLoading(false)
     }
   }
 
@@ -446,6 +462,9 @@ function App() {
                 <button title="Export as Markdown" onClick={handleExportEntry}>
                   <span className="material-symbols-outlined">download</span>
                 </button>
+                <button title="Get AI Insights" onClick={async () => { if (current) { await handleGetInsights(); setShowInsights(true) }}}>
+                  <span className="material-symbols-outlined">auto_awesome</span>
+                </button>
                 <button 
                   title={current.category === 'archive' ? 'Unarchive' : 'Archive'} 
                   onClick={handleArchiveEntry}
@@ -638,6 +657,51 @@ function App() {
                 <button className="btn" onClick={() => setShowDeleteConfirm(false)}>Cancel</button>
                 <button className="delete-confirm-btn" onClick={() => { handleDelete(current.id); setShowDeleteConfirm(false) }}>Delete</button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showInsights && (
+        <div className="modal-overlay" onClick={() => setShowInsights(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>AI Insights</h2>
+              <button className="modal-close" onClick={() => setShowInsights(false)}>
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+            <div className="modal-body">
+              {insightsLoading ? (
+                <p className="insights-loading">Analyzing your entry...</p>
+              ) : insightsData ? (
+                <div className="insights-content">
+                  <div className="insights-section">
+                    <h4>Summary</h4>
+                    <p>{insightsData.summary}</p>
+                  </div>
+                  <div className="insights-section">
+                    <h4>Mood</h4>
+                    <p>{insightsData.mood}</p>
+                  </div>
+                  <div className="insights-section">
+                    <h4>Sentiment</h4>
+                    <p>{insightsData.sentiment}</p>
+                  </div>
+                  {insightsData.themes && insightsData.themes.length > 0 && (
+                    <div className="insights-section">
+                      <h4>Themes</h4>
+                      <div className="insights-tags">
+                        {insightsData.themes.map((theme, i) => (
+                          <span key={i} className="insight-tag">{theme}</span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <p className="insights-empty">No insights available. Click the AI button to generate insights.</p>
+              )}
             </div>
           </div>
         </div>
