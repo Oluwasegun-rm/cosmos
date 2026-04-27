@@ -37,9 +37,10 @@ def register_routes(app: Flask) -> None:
 
     @app.get("/api/entries")
     def api_list_entries():
-        """List saved journal entries, optionally filtered by category."""
+        """List saved journal entries, optionally filtered by category or tag."""
         category = request.args.get("category")
-        return jsonify({"entries": list_entries(category)})
+        tag = request.args.get("tag")
+        return jsonify({"entries": list_entries(category, tag)})
 
     @app.post("/api/entries")
     def api_create_entry():
@@ -48,8 +49,11 @@ def register_routes(app: Flask) -> None:
         content = str(payload.get("content", ""))
         title = str(payload.get("title", ""))
         category = str(payload.get("category", "journal"))
+        tags = payload.get("tags") or []
+        if not isinstance(tags, list):
+            tags = []
 
-        entry = create_entry(title=title, content=content, category=category)
+        entry = create_entry(title=title, content=content, category=category, tags=tags)
         return jsonify({"entry": entry}), 201
 
     @app.get("/api/entries/<int:entry_id>")
@@ -65,8 +69,8 @@ def register_routes(app: Flask) -> None:
     def api_update_entry(entry_id: int):
         """Update a journal entry."""
         payload = _get_json_payload()
-        if "title" not in payload and "content" not in payload and "category" not in payload:
-            return jsonify({"error": "title, content, or category is required"}), 400
+        if "title" not in payload and "content" not in payload and "category" not in payload and "tags" not in payload:
+            return jsonify({"error": "title, content, category, or tags is required"}), 400
 
         title = None
         if "title" in payload:
@@ -80,7 +84,13 @@ def register_routes(app: Flask) -> None:
         if "category" in payload:
             category = str(payload.get("category", ""))
 
-        entry = update_entry(entry_id, title=title, content=content, category=category)
+        tags = None
+        if "tags" in payload:
+            tags = payload.get("tags") or []
+            if not isinstance(tags, list):
+                tags = []
+
+        entry = update_entry(entry_id, title=title, content=content, category=category, tags=tags)
         if entry is None:
             return jsonify({"error": "entry not found"}), 404
 

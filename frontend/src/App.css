@@ -982,6 +982,44 @@
   color: var(--on-surface-variant);
   opacity: 0.6;
 }
+
+/* Tags editor */
+.tags-editor {
+  margin: 8px 0 12px 0;
+}
+.tags-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: var(--surface-container);
+  border: 1px solid var(--outline-variant);
+  border-radius: 16px;
+  font-size: 0.8rem;
+  color: var(--on-surface);
+}
+.tag-chip button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--on-surface-variant);
+}
+.tag-chip button:hover {
+  color: var(--primary);
+}
+.tag-input {
+  min-width: 120px;
+  border: 1px dashed var(--outline-variant);
+  background: transparent;
+  color: var(--on-surface);
+  padding: 6px 10px;
+  border-radius: 16px;
+}
   background: transparent;
   font-size: clamp(2rem, 4vw, 3.5rem);
   font-weight: 300;
@@ -1008,8 +1046,8 @@
   width: 100%;
   border: none;
   background: transparent;
-  font-size: 1.1rem;
-  line-height: 1.8;
+  font-size: var(--editor-font-size, 1.1rem);
+  line-height: var(--editor-line-height, 1.8);
   color: var(--on-surface);
   min-height: 300px;
   outline: none;

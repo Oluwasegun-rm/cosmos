@@ -24,8 +24,12 @@ export async function getCurrentUser() {
   return request('/api/auth/me')
 }
 
-export async function fetchEntries(category = null) {
-  const url = category ? `/api/entries?category=${category}` : '/api/entries'
+export async function fetchEntries(category = null, tag = null) {
+  let url = '/api/entries'
+  const params = []
+  if (category) params.push(`category=${encodeURIComponent(category)}`)
+  if (tag) params.push(`tag=${encodeURIComponent(tag)}`)
+  if (params.length) url += `?${params.join('&')}`
   return request(url)
 }
 

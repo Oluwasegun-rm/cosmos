@@ -88,7 +88,10 @@ function App() {
   const [insightsData, setInsightsData] = useState(null)
   const [insightsLoading, setInsightsLoading] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [tagFilter, setTagFilter] = useState('')
   const [stats, setStats] = useState({ total: 0, journal: 0, reflections: 0, universe: 0, archive: 0 })
+  const [editorFontSize, setEditorFontSize] = useState(() => Number(localStorage.getItem('cosmos-editor-font') || 1.1))
+  const [editorLineHeight, setEditorLineHeight] = useState(() => Number(localStorage.getItem('cosmos-editor-line') || 1.8))
   const [user, setUser] = useState(null)
   const [showLogin, setShowLogin] = useState(false)
   const [showSignup, setShowSignup] = useState(false)
@@ -98,6 +101,13 @@ function App() {
     checkAuth()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  useEffect(() => {
+    document.documentElement.style.setProperty('--editor-font-size', `${editorFontSize}rem`)
+    document.documentElement.style.setProperty('--editor-line-height', `${editorLineHeight}`)
+    localStorage.setItem('cosmos-editor-font', String(editorFontSize))
+    localStorage.setItem('cosmos-editor-line', String(editorLineHeight))
+  }, [editorFontSize, editorLineHeight])
 
   async function checkAuth() {
     try {
@@ -127,7 +137,11 @@ function App() {
 
   useEffect(() => {
     if (!current) return
-    if (editor.title === current.title && editor.content === current.content) return
+    if (
+      editor.title === current.title &&
+      editor.content === current.content &&
+      (JSON.stringify(editor.tags || []) === JSON.stringify(current.tags || []))
+    ) return
 
     const id = setTimeout(async () => {
       setSaving(true)
@@ -170,7 +184,7 @@ function App() {
   async function loadEntries() {
     setLoading(true)
     try {
-      const { entries: list } = await fetchEntries(currentSection)
+      const { entries: list } = await fetchEntries(currentSection, tagFilter || null)
       const { entries: all } = await fetchEntries()
       setEntries(list)
       
@@ -199,7 +213,7 @@ function App() {
     try {
       const { entry } = await fetchEntry(id)
       setCurrent(entry)
-      setEditor({ title: entry.title, content: entry.content, category: entry.category })
+      setEditor({ title: entry.title, content: entry.content, category: entry.category, tags: entry.tags || [] })
     } catch (err) {
       console.error('Failed to load entry:', err)
       setSelectedId(null)
@@ -407,6 +421,15 @@ function App() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
+          <input
+            type="text"
+            className="search-input"
+            style={{ marginLeft: 8 }}
+            placeholder="Filter by tag..."
+            value={tagFilter}
+            onChange={(e) => setTagFilter(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') loadEntries() }}
+          />
           {searchQuery && (
             <button className="search-clear" onClick={() => setSearchQuery('')}>
               <span className="material-symbols-outlined">close</span>
@@ -518,6 +541,7 @@ function App() {
                 onChange={handleTitleChange}
                 aria-label="Note title"
               />
+              <TagsEditor tags={editor.tags || []} onChange={(next) => setEditor(prev => ({ ...prev, tags: next }))} />
               <div className="editor-content">
                 <textarea
                   placeholder="Start writing..."
@@ -558,6 +582,35 @@ function App() {
                     <span className="material-symbols-outlined">dark_mode</span>
                     Dark
                   </button>
+                </div>
+              </div>
+              <div className="settings-section">
+                <h3>Editor Appearance</h3>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ minWidth: 110 }}>Font size</span>
+                    <input
+                      type="range"
+                      min="1.0"
+                      max="1.6"
+                      step="0.05"
+                      value={editorFontSize}
+                      onChange={(e) => setEditorFontSize(Number(e.target.value))}
+                    />
+                    <span>{editorFontSize.toFixed(2)}rem</span>
+                  </label>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ minWidth: 110 }}>Line height</span>
+                    <input
+                      type="range"
+                      min="1.4"
+                      max="2.2"
+                      step="0.05"
+                      value={editorLineHeight}
+                      onChange={(e) => setEditorLineHeight(Number(e.target.value))}
+                    />
+                    <span>{editorLineHeight.toFixed(2)}</span>
+                  </label>
                 </div>
               </div>
               {user && (
@@ -771,6 +824,52 @@ function syncPreview(id, ed, setEntries) {
 
 function buildPreview(content) {
   return content.trim().replace(/\s+/g, ' ').slice(0, 140)
+}
+
+function TagsEditor({ tags, onChange }) {
+  const [input, setInput] = useState('')
+
+  function addTagFromInput() {
+    const t = input.trim()
+    if (!t) return
+    const next = Array.from(new Set([...(tags || []), t]))
+    onChange(next)
+    setInput('')
+  }
+
+  function removeTag(tag) {
+    onChange((tags || []).filter(t => t !== tag))
+  }
+
+  return (
+    <div className="tags-editor">
+      <div className="tags-list">
+        {(tags || []).map(tag => (
+          <span key={tag} className="tag-chip">
+            {tag}
+            <button onClick={() => removeTag(tag)} aria-label={`Remove ${tag}`}>
+              ×
+            </button>
+          </span>
+        ))}
+        <input
+          className="tag-input"
+          value={input}
+          onChange={e => setInput(e.target.value)}
+          onKeyDown={e => {
+            if (e.key === 'Enter' || e.key === ',') {
+              e.preventDefault()
+              addTagFromInput()
+            }
+            if (e.key === 'Backspace' && !input && (tags || []).length > 0) {
+              removeTag(tags[tags.length - 1])
+            }
+          }}
+          placeholder="Add tag"
+        />
+      </div>
+    </div>
+  )
 }
 
 function AuthModal({ type, onClose, onSwitch, onAuthSuccess }) {

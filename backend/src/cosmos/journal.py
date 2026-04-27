@@ -10,38 +10,36 @@ from .db import get_db
 PREVIEW_LENGTH = 140
 
 
-def list_entries(category: str | None = None) -> list[dict]:
-    """Return journal entries ordered by recent activity, optionally filtered by category."""
+def list_entries(category: str | None = None, tag: str | None = None) -> list[dict]:
+    """Return journal entries ordered by recent activity, optionally filtered by category or tag."""
+    params: list = []
+    where_clauses: list[str] = []
     if category:
-        rows = (
-            get_db()
-            .execute(
-                """
-            SELECT id, title, content, category, created_at, updated_at
+        where_clauses.append("category = ?")
+        params.append(category)
+    if tag:
+        # Simple LIKE match against JSON array; adequate for small local DB
+        where_clauses.append("tags_json LIKE ?")
+        params.append(f'%"{tag}"%')
+
+    where_sql = ("WHERE " + " AND ".join(where_clauses)) if where_clauses else ""
+    rows = (
+        get_db()
+        .execute(
+            f"""
+            SELECT id, title, content, category, tags_json, created_at, updated_at
             FROM entries
-            WHERE category = ?
+            {where_sql}
             ORDER BY updated_at DESC, id DESC
             """,
-                (category,),
-            )
-            .fetchall()
+                params,
         )
-    else:
-        rows = (
-            get_db()
-            .execute(
-                """
-            SELECT id, title, content, category, created_at, updated_at
-            FROM entries
-            ORDER BY updated_at DESC, id DESC
-            """
-            )
-            .fetchall()
-        )
+        .fetchall()
+    )
     return [_serialize_entry(row, include_content=False) for row in rows]
 
 
-def create_entry(title: str, content: str, category: str = "journal") -> dict:
+def create_entry(title: str, content: str, category: str = "journal", tags: list[str] | None = None) -> dict:
     """Create a journal entry and return it."""
     cleaned_content = content.strip()
     cleaned_title = _normalize_title(title, cleaned_content)
@@ -49,12 +47,13 @@ def create_entry(title: str, content: str, category: str = "journal") -> dict:
     valid_category = category if category in {"journal", "reflections", "universe", "archive"} else "journal"
 
     connection = get_db()
+    tags_json = json.dumps([t.strip() for t in (tags or []) if t.strip()])
     cursor = connection.execute(
         """
-        INSERT INTO entries (title, content, category, created_at, updated_at)
-        VALUES (?, ?, ?, ?, ?)
+        INSERT INTO entries (title, content, category, tags_json, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?)
         """,
-        (cleaned_title, cleaned_content, valid_category, timestamp, timestamp),
+        (cleaned_title, cleaned_content, valid_category, tags_json, timestamp, timestamp),
     )
     connection.commit()
 
@@ -67,7 +66,7 @@ def get_entry(entry_id: int) -> dict | None:
         get_db()
         .execute(
             """
-        SELECT id, title, content, category, created_at, updated_at
+        SELECT id, title, content, category, tags_json, created_at, updated_at
         FROM entries
         WHERE id = ?
         """,
@@ -87,6 +86,7 @@ def update_entry(
     title: str | None = None,
     content: str | None = None,
     category: str | None = None,
+    tags: list[str] | None = None,
 ) -> dict | None:
     """Update a journal entry and return the latest version."""
     existing = get_entry(entry_id)
@@ -105,15 +105,29 @@ def update_entry(
     if category is not None:
         next_category = category if category in {"journal", "reflections", "universe", "archive"} else existing["category"]
 
+    next_tags_json = None
+    if tags is not None:
+        next_tags_json = json.dumps([t.strip() for t in tags if t.strip()])
+
     connection = get_db()
-    connection.execute(
-        """
-        UPDATE entries
-        SET title = ?, content = ?, category = ?, updated_at = ?
-        WHERE id = ?
-        """,
-        (next_title, next_content, next_category, _utc_now(), entry_id),
-    )
+    if next_tags_json is None:
+        connection.execute(
+            """
+            UPDATE entries
+            SET title = ?, content = ?, category = ?, updated_at = ?
+            WHERE id = ?
+            """,
+            (next_title, next_content, next_category, _utc_now(), entry_id),
+        )
+    else:
+        connection.execute(
+            """
+            UPDATE entries
+            SET title = ?, content = ?, category = ?, tags_json = ?, updated_at = ?
+            WHERE id = ?
+            """,
+            (next_title, next_content, next_category, next_tags_json, _utc_now(), entry_id),
+        )
     connection.commit()
 
     return get_entry(entry_id)
@@ -267,6 +281,12 @@ def _serialize_entry(row, *, include_content: bool) -> dict:
             entry["category"] = "journal"
     if include_content:
         entry["content"] = row["content"]
+    # tags if selected column exists
+    try:
+        if row["tags_json"] is not None:
+            entry["tags"] = json.loads(row["tags_json"]) or []
+    except Exception:
+        pass
     return entry
 
 

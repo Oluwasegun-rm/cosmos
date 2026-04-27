@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS entries (
     title TEXT NOT NULL,
     content TEXT NOT NULL,
     category TEXT NOT NULL DEFAULT 'journal',
+    tags_json TEXT NOT NULL DEFAULT '[]',
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL
 );
@@ -80,7 +81,19 @@ def init_db() -> None:
     """Create database tables if they do not already exist."""
     connection = get_db()
     connection.executescript(SCHEMA)
+    _run_migrations(connection)
     connection.commit()
+
+
+def _run_migrations(connection: sqlite3.Connection) -> None:
+    """Apply small forward-only migrations for SQLite schema drift."""
+    # Ensure entries.tags_json exists
+    info = connection.execute("PRAGMA table_info(entries)").fetchall()
+    cols = {row[1] for row in info}
+    if "tags_json" not in cols:
+        connection.execute(
+            "ALTER TABLE entries ADD COLUMN tags_json TEXT NOT NULL DEFAULT '[]'"
+        )
 
 
 def _resolve_database_path(database_url: str) -> str:
