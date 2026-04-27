@@ -92,6 +92,7 @@ function App() {
   const [stats, setStats] = useState({ total: 0, journal: 0, reflections: 0, universe: 0, archive: 0 })
   const [editorFontSize, setEditorFontSize] = useState(() => Number(localStorage.getItem('cosmos-editor-font') || 1.1))
   const [editorLineHeight, setEditorLineHeight] = useState(() => Number(localStorage.getItem('cosmos-editor-line') || 1.8))
+  const [editorFontFamily, setEditorFontFamily] = useState(() => localStorage.getItem('cosmos-editor-font-family') || 'sans')
   const [user, setUser] = useState(null)
   const [showLogin, setShowLogin] = useState(false)
   const [showSignup, setShowSignup] = useState(false)
@@ -105,9 +106,16 @@ function App() {
   useEffect(() => {
     document.documentElement.style.setProperty('--editor-font-size', `${editorFontSize}rem`)
     document.documentElement.style.setProperty('--editor-line-height', `${editorLineHeight}`)
+    const familyMap = {
+      sans: 'Inter, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif',
+      serif: 'Georgia, Cambria, "Times New Roman", Times, serif',
+      mono: 'SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+    }
+    document.documentElement.style.setProperty('--editor-font-family', familyMap[editorFontFamily] || familyMap.sans)
     localStorage.setItem('cosmos-editor-font', String(editorFontSize))
     localStorage.setItem('cosmos-editor-line', String(editorLineHeight))
-  }, [editorFontSize, editorLineHeight])
+    localStorage.setItem('cosmos-editor-font-family', editorFontFamily)
+  }, [editorFontSize, editorLineHeight, editorFontFamily])
 
   async function checkAuth() {
     try {
@@ -611,6 +619,26 @@ function App() {
                     />
                     <span>{editorLineHeight.toFixed(2)}</span>
                   </label>
+                </div>
+                <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+                  <button
+                    className={`theme-btn ${editorFontFamily === 'sans' ? 'active' : ''}`}
+                    onClick={() => setEditorFontFamily('sans')}
+                  >
+                    Sans
+                  </button>
+                  <button
+                    className={`theme-btn ${editorFontFamily === 'serif' ? 'active' : ''}`}
+                    onClick={() => setEditorFontFamily('serif')}
+                  >
+                    Serif
+                  </button>
+                  <button
+                    className={`theme-btn ${editorFontFamily === 'mono' ? 'active' : ''}`}
+                    onClick={() => setEditorFontFamily('mono')}
+                  >
+                    Mono
+                  </button>
                 </div>
               </div>
               {user && (

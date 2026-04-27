@@ -1051,7 +1051,7 @@
   color: var(--on-surface);
   min-height: 300px;
   outline: none;
-  font-family: var(--font);
+  font-family: var(--editor-font-family, var(--font));
   font-weight: 400;
   resize: none;
 }
