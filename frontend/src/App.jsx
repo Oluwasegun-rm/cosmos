@@ -396,9 +396,6 @@ function App() {
 
       <section className="entry-list-panel">
         <div className="entry-list-header">
-          <button className="list-toggle" onClick={() => setEntryListOpen(!entryListOpen)} title={entryListOpen ? 'Collapse list' : 'Expand list'}>
-            <span className="material-symbols-outlined">{entryListOpen ? 'chevron_left' : 'list'}</span>
-          </button>
           <span className="entry-list-label">{SECTIONS[currentSection] || 'All Entries'}</span>
         </div>
         <div className="search-container">
