@@ -963,9 +963,11 @@
 }
 
 .editor-canvas {
-  max-width: 680px;
+  max-width: 720px;
   width: 100%;
+  margin: 0 auto;
   padding: 32px 24px 100px;
+  box-sizing: border-box;
 }
 
 .editor-date {
@@ -974,8 +976,7 @@
   letter-spacing: 0.25em;
   font-weight: 600;
   color: var(--primary);
-  margin-bottom: 20px;
-  margin-left: 0;
+  margin-bottom: 12px;
 }
 
 .editor-title {
@@ -985,7 +986,7 @@
   font-size: 1.75rem;
   font-weight: 600;
   color: var(--on-surface);
-  margin-bottom: 12px;
+  margin-bottom: 8px;
   padding: 0;
   outline: none;
 }
