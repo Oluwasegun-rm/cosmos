@@ -311,7 +311,7 @@ function App() {
         </header>
         
         <div className="landing-content">
-          <h1 className="landing-title">Journal your thoughts<br/>with intent</h1>
+          <h1 className="landing-title">Journal your thoughts with intent</h1>
           <p className="landing-subtitle">A calm space to write, reflect, and revisit your thoughts.</p>
           <button className="btn btn-primary-lg" onClick={() => setView('app')}>
             Start Writing
@@ -476,11 +476,20 @@ function App() {
               </button>
             )}
             {user ? (
-              <button className="user-menu-btn" onClick={() => setShowSettings(true)}>
-                <span className="user-avatar">{user.display_name.charAt(0).toUpperCase()}</span>
-                <span className="user-name">{user.display_name}</span>
-                <span className="material-symbols-outlined">expand_more</span>
-              </button>
+              <div className="user-actions">
+                <button className="user-menu-btn" onClick={() => setShowSettings(true)}>
+                  <span className="user-avatar">{user.display_name.charAt(0).toUpperCase()}</span>
+                  <span className="user-name">{user.display_name}</span>
+                  <span className="material-symbols-outlined">expand_more</span>
+                </button>
+                <button
+                  title="Log out"
+                  className="btn btn-ghost btn-sm logout-btn"
+                  onClick={async () => { await apiLogout(); setUser(null) }}
+                >
+                  Log out
+                </button>
+              </div>
             ) : (
               <div className="auth-buttons">
                 <button className="btn btn-ghost btn-sm" onClick={() => setShowLogin(true)}>Log in</button>
