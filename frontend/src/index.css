@@ -1,24 +1,24 @@
 :root, [data-theme="light"] {
-  --background: #f9f9fb;
+  --background: #fafafc;
   --surface-container-lowest: #ffffff;
-  --surface-container: #eeeef0;
-  --surface-container-high: #e8e8ea;
-  --surface-dim: #d9dadc;
-  --surface: #f9f9fb;
-  --on-background: #1a1c1d;
-  --on-surface: #1a1c1d;
-  --on-surface-variant: #414755;
-  --primary: #0058bc;
-  --primary-fixed: #d8e2ff;
-  --primary-container: #0070eb;
+  --surface-container: #f0f0f3;
+  --surface-container-high: #e8e8ec;
+  --surface-dim: #e0e0e3;
+  --surface: #fafafc;
+  --on-background: #1a1a2e;
+  --on-surface: #1a1a2e;
+  --on-surface-variant: #6b6b80;
+  --primary: #4f46e5;
+  --primary-fixed: #e0e7ff;
+  --primary-container: #6366f1;
   --on-primary: #ffffff;
-  --on-primary-container: #fefcff;
-  --secondary: #5e5e5e;
+  --on-primary-container: #e0e7ff;
+  --secondary: #6b7280;
   --on-secondary: #ffffff;
-  --tertiary: #9e3d00;
-  --outline: #717786;
-  --outline-variant: #c1c6d7;
-  --error: #ba1a1a;
+  --tertiary: #059669;
+  --outline: #a1a1b5;
+  --outline-variant: #d1d1d9;
+  --error: #dc2626;
   
   --font: "Inter", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
   font-family: var(--font);
@@ -29,26 +29,26 @@
 }
 
 [data-theme="dark"] {
-  --background: #121212;
-  --surface-container-lowest: #1e1e1e;
-  --surface-container: #2a2a2a;
-  --surface-container-high: #333333;
-  --surface-dim: #3a3a3a;
-  --surface: #121212;
-  --on-background: #e6e1e5;
-  --on-surface: #e6e1e5;
-  --on-surface-variant: #cac4d0;
-  --primary: #a8c7fa;
-  --primary-fixed: #004a77;
-  --primary-container: #004a77;
-  --on-primary: #062f6e;
-  --on-primary-container: #d8e2ff;
-  --secondary: #c0c0c0;
-  --on-secondary: #1e1e1e;
-  --tertiary: #ffb68c;
-  --outline: #938f99;
-  --outline-variant: #49454f;
-  --error: #f2b8b5;
+  --background: #0f0f12;
+  --surface-container-lowest: #18181d;
+  --surface-container: #1e1e28;
+  --surface-container-high: #262631;
+  --surface-dim: #2d2d3a;
+  --surface: #0f0f12;
+  --on-background: #f1f1f5;
+  --on-surface: #f1f1f5;
+  --on-surface-variant: #a1a1b5;
+  --primary: #818cf8;
+  --primary-fixed: #312e81;
+  --primary-container: #4338ca;
+  --on-primary: #1e1b4b;
+  --on-primary-container: #e0e7ff;
+  --secondary: #a1a1b5;
+  --on-secondary: #1e1e28;
+  --tertiary: #34d399;
+  --outline: #6b6b80;
+  --outline-variant: #3d3d4a;
+  --error: #f87171;
 }
 
 *,

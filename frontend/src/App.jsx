@@ -433,8 +433,6 @@ function App() {
       <main className="editor-area">
         <header className="editor-header">
           <div className="editor-meta">
-            <span className="editor-meta-status">Sanctuary Mode</span>
-            <span className="editor-meta-dot"></span>
             <span className="editor-meta-saving">
               {saving ? 'Saving...' : lastSaved ? `Saved ${formatTime(lastSaved)}` : ''}
             </span>
@@ -459,10 +457,11 @@ function App() {
               </button>
             )}
             {user ? (
-              <div className="user-menu">
+              <button className="user-menu-btn" onClick={() => setShowSettings(true)}>
+                <span className="user-avatar">{user.display_name.charAt(0).toUpperCase()}</span>
                 <span className="user-name">{user.display_name}</span>
-                <button className="btn btn-ghost btn-sm" onClick={async () => { await apiLogout(); setUser(null) }}>Log out</button>
-              </div>
+                <span className="material-symbols-outlined">expand_more</span>
+              </button>
             ) : (
               <div className="auth-buttons">
                 <button className="btn btn-ghost btn-sm" onClick={() => setShowLogin(true)}>Log in</button>
