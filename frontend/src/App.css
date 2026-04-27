@@ -929,16 +929,19 @@
   background: none;
   border: none;
   cursor: pointer;
-  color: var(--outline);
-  transition: color 0.3s;
+  color: var(--on-surface-variant);
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.2s;
 }
 
 .editor-actions button:hover {
+  background: var(--surface-container);
   color: var(--primary);
 }
 
 .editor-actions .material-symbols-outlined {
-  font-size: 1.2rem;
+  font-size: 1.25rem;
 }
 
 .editor-user-avatar {
