@@ -551,6 +551,23 @@ function App() {
                   </button>
                 </div>
               </div>
+              {user && (
+                <div className="settings-section">
+                  <h3>Account</h3>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div>
+                      <p style={{ margin: 0, fontWeight: 600 }}>{user.display_name}</p>
+                      <p style={{ margin: 0, color: 'var(--on-surface-variant)', fontSize: '0.9rem' }}>{user.email}</p>
+                    </div>
+                    <button
+                      className="btn btn-primary"
+                      onClick={async () => { await apiLogout(); setUser(null); setShowSettings(false) }}
+                    >
+                      Sign out
+                    </button>
+                  </div>
+                </div>
+              )}
               <div className="settings-section">
                 <h3>Statistics</h3>
                 <div className="stats-grid">
