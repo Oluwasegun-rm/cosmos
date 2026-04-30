@@ -266,6 +266,7 @@ def save_insights(
 
 def _serialize_entry(row, *, include_content: bool) -> dict:
     """Convert a SQLite row into the API shape."""
+    # Compose entry object from row columns; fall back to sensible defaults
     entry = {
         "id": row["id"],
         "title": row["title"],
@@ -274,17 +275,19 @@ def _serialize_entry(row, *, include_content: bool) -> dict:
         "created_at": row["created_at"],
         "updated_at": row["updated_at"],
     }
-    if len(row) > 3:
-        try:
-            entry["category"] = row["category"]
-        except Exception:
-            entry["category"] = "journal"
+    # Category if present in row keys
+    try:
+        if "category" in row.keys():  # type: ignore[attr-defined]
+            entry["category"] = row["category"] or "journal"
+    except Exception:
+        pass
     if include_content:
         entry["content"] = row["content"]
-    # tags if selected column exists
+    # Tags if present in row keys
     try:
-        if row["tags_json"] is not None:
-            entry["tags"] = json.loads(row["tags_json"]) or []
+        if "tags_json" in row.keys():  # type: ignore[attr-defined]
+            if row["tags_json"] is not None:
+                entry["tags"] = json.loads(row["tags_json"]) or []
     except Exception:
         pass
     return entry
